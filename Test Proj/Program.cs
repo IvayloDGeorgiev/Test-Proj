@@ -1,4 +1,8 @@
+using Test_Proj.Options;
+
 var builder = WebApplication.CreateBuilder(args);
+builder.Configuration.AddDevelopmentLocalConfiguration(builder.Environment);
+builder.Services.AddIngestionOptions(builder.Configuration, builder.Environment);
 
 // Add services to the container.
 
@@ -7,16 +11,6 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
-
-// Load local-only configuration
-if (builder.Environment.IsDevelopment())
-{
-    builder.Configuration.AddJsonFile(
-        "appsettings.Local.json",
-        optional: true,
-        reloadOnChange: true);
-}
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

@@ -363,3 +363,8 @@ MigrationBackup/
 FodyWeavers.xsd
 # Local configuration containing secrets
 appsettings.Local.json
+
+# Generated ingestion exports
+Forces.csv
+Crimes_????-??.csv
+StopSearches_????-??.csv

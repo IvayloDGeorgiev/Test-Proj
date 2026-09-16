@@ -1,3 +1,4 @@
 <Solution>
   <Project Path="Test Proj/Test Proj.csproj" />
+  <Project Path="tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj" />
 </Solution>
