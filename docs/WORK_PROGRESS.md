@@ -4,8 +4,8 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 
 ## Planning inspection — 2026-09-16
 
-- Planning status: IN PROGRESS; documentation prepared, commit/push pending.
-- Branch intended: docs/project-planning.
+- Planning status: COMPLETED; documentation consistency checks passed and planning commit pushed and verified.
+- Branch: docs/project-planning. Planning commit: 829da51b36b9ccaa62c996a60ffb20978b37f173. Push evidence: git ls-remote origin refs/heads/docs/project-planning returned that exact SHA on 2026-09-16. This documentation-only receipt must also be pushed before Stage 1 dispatch.
 - Baseline: main, commit 55f0bb2; working tree clean.
 - Existing solution: Test Proj.slnx; app: Test Proj/Test Proj.csproj; net10.0; namespace Test_Proj; SDK 10.0.401.
 - Existing source: WeatherForecast template only. No ingestion or test projects.
@@ -15,7 +15,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 - Issue identified: local provider is added after builder.Build(). Stage 1 moves it earlier and tests precedence using synthetic values.
 - Decision: preserve physical app/solution names; add only necessary test project in Stage 1. Eight sequential stages with security alongside each feature. Separate POSTs; /run deferred.
 - Planning checks: PASSED nine required documents, local links, exact eight-stage names/order and requirement/architecture/test/security consistency review. Local secrets remain ignored and untracked; existing source diff is empty. Commit SHA and push evidence will be recorded only after actual success in a separate receipt.
-- Automatic task creation: available through this environment's task tools; optional Stage 1 dispatch has not occurred.
+- Automatic task creation: available through this environment's task tools; Stage 1 dispatch prepared; no task created yet.
 - Planning next stage: Stage 1, only after planning push.
 
 ## Stage index
@@ -33,7 +33,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 
 ## Dispatch ledger
 
-No tasks dispatched. No stage owner. Before dispatch follow WORKFLOW.md; record dispatch key, predecessor tip, PENDING/CREATED/BLOCKED state, task identity and UTC timestamp. Do not assume absence here proves no task exists; inspect tool state.
+Dispatch key: Test-Proj:stage-01. State: PENDING. Target: Stage 1 only, fresh worktree from docs/project-planning after this receipt is pushed. Planning implementation tip: 829da51b36b9ccaa62c996a60ffb20978b37f173. Task ID: not yet returned. Duplicate check: project task listing showed no Stage 1 task on 2026-09-16. Coordinator: planning task. Child must inspect the latest remote dispatch ledger before claiming work. No implementation stage owner yet.
 
 ## Stage 1: Project and test foundation
 
