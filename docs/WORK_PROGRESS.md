@@ -25,7 +25,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
-| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | IN PROGRESS |
+| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
@@ -115,16 +115,16 @@ Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target
 
 ## Stage 4: Forces ingestion endpoint
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/04-forces-ingestion
 - Prerequisites: Stage 3 completed and remote receipt verified
 - Owner/task ID: 01a0a9a8-5ee4-7450-b19c-a0aaba75e2a8 (dispatch client-new-thread:ae0dfc0a-8c2a-4c19-bbb4-789cc138d7cd)
 - Base SHA: c44155ec5deeb8f340fe1603214d963c1ee32b67; predecessor implementation 293f05452e8227b9cf5905bc1e7146150cbb7592 and receipt ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14 ancestry and remote tip verified; coordinator dispatch update reconciled.
 - Started (UTC): 2026-09-16T10:00:49.5592072Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Stage 4 implemented and reviewed; restore, targeted/full tests and build passed. Status remains IN PROGRESS until implementation push is verified. Claim 0761388f4e7afac0ca65ef06b52105e9bd794a54 pushed and independently verified.
+- Completed (UTC): 2026-09-16T10:08:03.7113434Z
+- Commit SHA (implementation): 2d396373206fdc526f212d09f7d209097ab1fba1
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/04-forces-ingestion returned exactly 2d396373206fdc526f212d09f7d209097ab1fba1. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Stage 4 implemented and reviewed; restore, targeted/full tests and build passed. Implementation push independently verified; this receipt records completion. Claim 0761388f4e7afac0ca65ef06b52105e9bd794a54 pushed and independently verified.
 - Functionality implemented: POST /api/ingestion/forces; scoped service with eager required id/name validation and explicit text-cell mapping; shared lease acquired before retrieval and held through publication; common safe success metadata with exported count, code-owned filename and UTC completion time; centralized sanitized ProblemDetails with stable codes/trace IDs, safe logs and disconnected-caller handling. Empty/repeated export replacement uses the existing atomic exporter. Removed WeatherForecast model/controller and updated HTTPS .http example.
 - Tests added: 36 genuine AAA forces tests using fake client/export/service boundaries with real mapping/service/controller/middleware, plus real temporary-directory exports. Frozen official fixture, exact header/order/UTF-8/escaping/formula protection, counts/result shape, repeated/empty replacement, null/blank required records, no export after invalid data, retrieval/publication contention, token propagation, cancellation before/during/after retrieval and during export, publication commit point, write failure/preservation/cleanup/lease release, controller interaction/failure, all upstream failure categories and safe arbitrary exception/code handling, disconnected caller and response/log sanitization.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Forces --no-restore PASSED exit 0, 109 passed, 0 failed/skipped (36 new + 73 existing forces transport cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Forces PASSED exit 0, 36 passed.
