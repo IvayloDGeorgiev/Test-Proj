@@ -1,5 +1,15 @@
 # Security
 
+## Stage 9 database and browser controls
+
+DefaultConnection is supplied through trusted normal configuration; no actual connection values or credentials belong in examples, source, logs, tests or static assets. The design-time factory reads only the environment and does not inspect User Secrets/local JSON. Database errors return fixed codes; EF uses NullLoggerFactory and disables sensitive data/detailed errors; Npgsql parameter/error-detail logging is disabled. Connection and command timeouts are bounded. Database reads are paginated and historical updates load only matching keys. Schema changes are explicit EF migrations, separate from normal application startup.
+
+PostgreSQL composite primary/unique source keys prevent duplicate identities; constraints protect metadata. Sync uses one transaction with a nonblocking advisory lock plus existing process admission, upstream bounds, token propagation and whole-operation deadline. Failure rolls back; a commit acknowledgment failure may be uncertain and must be checked by read/repeat. Stop/search query snapshots do not claim globally unique event identity. Stored public records may still be sensitive: database ACLs, encryption, backup and retention belong to the operator.
+
+Static assets contain no database access or connection configuration. Stored values are rendered with textContent, never HTML execution. Same-origin fetch, restrictive CSP, nosniff, a required custom sync header and Origin checks prevent ordinary cross-origin browser sync requests. No permissive CORS or external scripts/fonts are used. These browser controls are not authentication and do not authorize public hosting. Data GETs use no-store. Operators must keep loopback/trusted local deployment and prevent untrusted local clients/host routing.
+
+Automated tests launch a disposable PostgreSQL 16 cluster on loopback with a random port and generated per-test databases, using test-only local trust authentication and no passwords. Only generated application tables from EF migrations are used; a test-only added constraint injects a rollback failure. The fixture stops the cluster and deletes only its validated GUID sandbox. Tests do not reuse the operator's PostgreSQL service or access private configuration. Node tests execute frontend behavior with synthetic DOM/fetch boundaries and no network.
+
 ## Secrets and Git
 
 Never read/display appsettings.Local.json merely to prove credentials exist. Keep it ignored and untracked, including nested copies; before staging/committing run git check-ignore "Test Proj/appsettings.Local.json" from the root and inspect staged filenames. Stage explicit intended paths only. Never include credentials in examples, tests, source, docs, logs, chat or command lines. Do not copy the local file into isolated worktrees or published output. Stage 1 explicitly excludes it from build/publish content.

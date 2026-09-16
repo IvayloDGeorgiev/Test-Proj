@@ -2,7 +2,7 @@
 
 The existing .NET 10 controller application now provides **POST /api/ingestion/forces**, **POST /api/ingestion/crimes** and **POST /api/ingestion/stop-searches**, with validated configuration, reusable Police API transport, safe CSV storage, and an xUnit suite. The WeatherForecast template has been removed.
 
-The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. It retrieves public UK Police data and exports Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv. There is no database, background job, combined run route, or file download endpoint.
+The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. It retrieves public UK Police data and exports Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv. Stage 9 adds PostgreSQL persistence, independent synchronization APIs and a static frontend in this same application. There is no background job, combined run route, or file download endpoint.
 
 Use Windows with the .NET 10 SDK and a trusted, account-owned output directory on a local fixed drive. Atomic replacement is verified on local NTFS. From the repository root:
 
@@ -101,9 +101,51 @@ Invoke-RestMethod -Method Post -Uri "$base/crimes" -ContentType 'application/jso
 Invoke-RestMethod -Method Post -Uri "$base/stop-searches" -ContentType 'application/json' -Body $body
 ```
 
-This is a trusted local service. Public hosting, authentication, distributed concurrency, output retention and filesystem permissions remain operator/deployment boundaries described in SECURITY.md. TestServer verifies the application pipeline; TLS and deployment-specific web server limits need verification in the intended deployment. The final isolated suite contains 566 passing cases (120 host integration cases), with requirement evidence in [TEST_STRATEGY.md](docs/TEST_STRATEGY.md) and verified commit/push records in [WORK_PROGRESS.md](docs/WORK_PROGRESS.md).
+This is a trusted local service. Public hosting, authentication, output retention and filesystem permissions remain operator/deployment boundaries described in SECURITY.md. TestServer verifies the application pipeline; TLS and deployment-specific web server limits need verification in the intended deployment. The isolated .NET suite contains 591 passing cases (566 predecessor cases plus 25 Stage 9 persistence cases), with six additional Node frontend cases. Requirement evidence is in [TEST_STRATEGY.md](docs/TEST_STRATEGY.md) and verified commit/push records in [WORK_PROGRESS.md](docs/WORK_PROGRESS.md).
 
-## Development documentation
+## PostgreSQL and the data explorer (Stage 9)
+
+Open the HTTPS application root to use the data explorer. It reads saved records through `/api/data/{dataset}` and synchronizes through `POST /api/sync/forces`, `/api/sync/crimes` or `/api/sync/stop-searches`. CSV ingestion remains independent: a database sync does not export files, and an export does not update PostgreSQL. The frontend makes same-origin API requests only, disables controls during requests, reports loading/empty/error/commit states, and refreshes saved data after a successful sync.
+
+Configure `ConnectionStrings:DefaultConnection` through normal ASP.NET Core configuration, preferably the process environment variable `ConnectionStrings__DefaultConnection` or your trusted external configuration provider. No connection value is included here. Do not put it in source, static assets, command arguments, logs or test fixtures. User Secrets work if configured for the application by the operator; they are not required by the tests or migration factory. The design-time factory intentionally reads only the environment and never loads local JSON or User Secrets. Missing/invalid configuration returns sanitized 503 on database routes; existing CSV routes still work.
+
+Create an empty dedicated PostgreSQL database and grant the appropriate migration/runtime permissions through your normal administrative tooling. Application tables must be created by EF migrations, not manually. With the trusted environment already configured, run from the repository root:
+
+```powershell
+dotnet tool restore
+dotnet ef database update --project "Test Proj/Test Proj.csproj"
+dotnet ef migrations list --project "Test Proj/Test Proj.csproj" --no-connect
+dotnet run --project "Test Proj/Test Proj.csproj" --launch-profile https
+```
+
+Migrations are explicit operator actions rather than automatic startup changes. The two checked-in migrations create `PoliceRecords` and its source-identity index. Offline model verification needs no connection:
+
+```powershell
+dotnet ef migrations has-pending-model-changes --project "Test Proj/Test Proj.csproj" -- --schema-only
+```
+
+All sync POST requests require header `X-Police-Sync: 1`. When an Origin header is present it must match the application's origin. Crimes and stop/search accept the same JSON location/month body as their ingestion counterparts; forces has no body. GET requests for crimes/stop-searches take `latitude`, `longitude`, `month`, `offset` (0..1000000) and `limit` (1..200, default 50). Forces needs only pagination. Results contain `items`, `hasMore`, `offset`, `limit` and `dataset`; each item includes validated data and first-seen/updated/last-seen UTC metadata. Crime reads show the accumulated month across all synced locations; stop/search reads show exactly the queried snapshot.
+
+Sync returns HTTP 200 after a single transaction commits, with `success`, `dataset`, `received` (validated unique identities, including identical stop/search occurrences), `inserted`, `updated`, `unchanged`, `removed`, `completedAtUtc`. Forces use force ID; crimes use month plus persistent ID, falling back to month plus numeric ID. Numeric-ID matching promotes a fallback when a persistent ID appears. If both IDs change with no common identifier, the source provides no reliable way to identify the same event. Exact duplicate force/crime identities collapse; conflicting identities fail the entire operation. Missing force/crime rows are retained, including after empty responses.
+
+Stop/search has no stable event ID. Each location/month is an independent replaceable snapshot keyed by a digest of the known DTO fields plus an occurrence number. Reordering does not duplicate records; identical events retain their multiplicity. Corrections appear as removed/inserted snapshot rows rather than guessed updates. Empty responses clear that snapshot only. Overlapping snapshots are not a globally deduplicated count of real-world events. No unvalidated response body is stored: the text column contains the canonical serialization of the validated DTO fields already supported by the ingestion app.
+
+Sync and CSV share immediate process admission (409). Database transactions additionally use a PostgreSQL advisory lock to prevent simultaneous sync writers across processes. The existing upstream limits and full-operation deadline apply. Failures roll back the transaction; a connection loss during commit can leave the outcome uncertain, so refresh or repeat the idempotent request. Database configuration failures return `database_not_configured`/503; database failures `database_unavailable`/503; database command timeouts `database_timeout`/504; origin rejection `sync_origin_rejected`/403. Other validation/upstream/limit codes match ingestion. EF connection/command/exception logging is disabled to prevent disclosure.
+
+### Verification and operator boundary
+
+Automated PostgreSQL tests create a disposable PostgreSQL 16 cluster bound only to loopback on a temporary port, generate per-test databases, apply real EF migrations, and stop/delete their own cluster. They never use your PostgreSQL service, credentials or User Secrets. Install PostgreSQL 16 binaries in the standard Windows location or set `POLICE_TEST_PG_BIN` to the binary directory. The cluster uses temporary local trust authentication and is for tests only. Node.js runs the dependency-free frontend behavior tests:
+
+```powershell
+dotnet test "Test Proj.slnx" --filter FullyQualifiedName~Persistence
+node --test tests/frontend.test.mjs
+dotnet test "Test Proj.slnx"
+dotnet build "Test Proj.slnx" --no-restore
+```
+
+The isolated migration/sync tests are the automated verification evidence. Applying migrations to your private configured database and live Police API smoke verification are operator-only checks and have not been claimed as performed. After setting the trusted environment, run the migration command above, open the explorer, sync forces twice, confirm the second sync adds zero duplicates, then verify a location/month dataset. Keep the application on a trusted local listener. TLS trust, database backup/access/retention and public hosting authentication remain deployment responsibilities.
+
+## Development documentation links
 
 - [Agent contract](AGENTS.md)
 - [Requirements](docs/REQUIREMENTS.md)

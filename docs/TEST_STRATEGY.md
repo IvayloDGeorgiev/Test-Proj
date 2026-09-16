@@ -1,5 +1,13 @@
 # Test strategy
 
+## Stage 9 verification
+
+`dotnet test "Test Proj.slnx" --filter FullyQualifiedName~Persistence` runs genuine AAA integration tests against an isolated PostgreSQL 16 process. The fixture discovers the standard Windows binaries or POLICE_TEST_PG_BIN, binds a temporary port on loopback, initializes a fresh generated cluster and creates independent test databases. All application tables come from `Database.MigrateAsync`; tests exercise apply/reapply/rollback/reapply and pending model detection, check constraints, unique identity, inserts/updates/repeats, identity promotion, stop/search multiplicity/reordering/correction/empty snapshots, invalid partial payload preservation, transactional rollback under a constraint fault, real database command timeout, local and database-level contention, API GET/POST and pagination/validation, origin/input limits, operation deadline, static assets/security headers and sanitized database failure logs. No private User Secrets, real operator database, real Police API or Desktop is used. Missing test binaries are a failure with setup guidance, not a silent skip.
+
+`node --test tests/frontend.test.mjs` uses the real frontend module with synthetic DOM/fetch boundaries. It asserts empty/loading/error states, busy guarding and disabled controls, repeat click suppression, successful sync refresh and counts, failed sync without refresh, successful commit retained when refresh fails, and literal rendering of malicious-looking stored text. No npm dependency or external network is required.
+
+The Stage 8 OpenAPI test retains its exact ingestion contract assertions and extends the expected route inventory with all four new routes. All 566 predecessor cases remain part of the full suite. EF offline model verification uses the design-time factory's `--schema-only`; restore/build and dependency vulnerability audit remain required. See WORK_PROGRESS for actual counts and commands. Private database migration/live smoke checks and deployment TLS verification are operator-only actions documented in README, distinct from the successful isolated database evidence.
+
 ## Rules and commands
 
 Use xUnit net10.0 in tests/PoliceDataIngestion.Api.Tests, referenced by the existing solution. Name tests Behaviour_Condition_ExpectedResult. Arrange meaningful inputs/dependencies, Act on the real system under test, Assert observable output and relevant side effects; AAA comments are encouraged. A test must fail when its behaviour breaks. Never Assert.True(true), mock the SUT, weaken assertions, remove valid failing tests, swallow failures or disable tests without a documented legitimate reason.

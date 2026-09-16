@@ -12,7 +12,9 @@ public sealed class IngestionLimitsMiddleware(RequestDelegate next, IOptions<Exp
 
     public async Task InvokeAsync(HttpContext context)
     {
-        if (!context.Request.Path.StartsWithSegments("/api/ingestion")) { await next(context); return; }
+        if (!context.Request.Path.StartsWithSegments("/api/ingestion") &&
+            !context.Request.Path.StartsWithSegments("/api/sync") &&
+            !context.Request.Path.StartsWithSegments("/api/data")) { await next(context); return; }
         var caller = context.RequestAborted;
         var originalBody = context.Request.Body;
         var previous = OperationDeadline.Current;

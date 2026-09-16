@@ -4,7 +4,7 @@ All requirements describe target behaviour; current implementation is recorded i
 
 ## Scope and endpoints
 
-R1. Retain net10.0, C#, controllers, DI, nullable reference types and OpenAPI. No second application or database.
+R1. Retain net10.0, C#, controllers, DI, nullable reference types and OpenAPI. No second application. Stage 9 adds the requested PostgreSQL database.
 R2. Provide synchronous POST /api/ingestion/forces, /crimes and /stop-searches. Forces accepts no parameters. Crimes and stop-searches require JSON latitude, longitude and month. Defer a combined /run route: separate operations avoid ambiguous partial success and keep resource limits clear.
 R3. Retrieve HTTPS GET /api/forces, /api/crimes-street/all-crime and /api/stops-street from the trusted configured Police API origin. No upstream authentication is expected. Supporting availability endpoints /api/crime-last-updated and /api/crimes-street-dates may inform future availability checks, but are not required dependencies.
 R4. Success is HTTP 200 only after final file publication, with success=true, dataset, recordCount, filename and completedAtUtc. No absolute paths. An empty array produces a header-only CSV and count zero. Failure must never report success or publish a partial file.
@@ -37,7 +37,9 @@ R18. Validated PoliceApiOptions and ExportOptions, HTTPS allowlisted host, no re
 R19. xUnit AAA unit tests must detect actual defects and isolate external systems. Every stage passes its targeted tests, all existing tests, build, documentation review, secret review, commit and verified push. Each R requirement is accepted only with the associated stage evidence.
 R20. Security controls apply before a feature is considered done; final verification does not postpone them.
 
-Out of scope: database, GitHub application integration, upstream API keys, background jobs, combined ingestion orchestration, user-supplied remote hosts, file download endpoints, UI, historical batch processing, distributed concurrency and public hosting/authentication design. Initial operation is a trusted local service; public exposure requires a separate security decision.
+R21. Stage 9: PostgreSQL through EF Core/Npgsql with configuration-owned DefaultConnection, explicit EF migrations, idempotent asynchronous sync, persisted reads and a same-origin static explorer. Preserve R1-R20 for CSV ingestion. Use source identities where available, document snapshot semantics where no identity exists, preserve atomicity, bound page sizes, sanitize failures and isolate database tests from operator configuration. Verify migrations against a real isolated local PostgreSQL database; document private database verification as an operator action.
+
+Out of scope: GitHub application integration, upstream API keys, background jobs, combined ingestion orchestration, user-supplied remote hosts, file download endpoints, historical batch processing and public hosting/authentication design. Initial operation is a trusted local service; public exposure requires a separate security decision. Database advisory locking protects sync transactions; distributed CSV concurrency remains unsupported.
 
 ## Upstream references
 

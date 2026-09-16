@@ -3,13 +3,14 @@ using Test_Proj.Clients.PoliceApi;
 using Test_Proj.Export;
 using Test_Proj.Services.Forces;
 using Test_Proj.Errors;
-using Scalar.AspNetCore;
+using Test_Proj.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddDevelopmentLocalConfiguration(builder.Environment);
 builder.Services.AddIngestionOptions(builder.Configuration, builder.Environment);
 builder.Services.AddPoliceApiClient();
 builder.Services.AddCsvExport();
+builder.Services.AddPolicePersistence(builder.Configuration);
 builder.Services.AddScoped<Test_Proj.Services.StopSearches.IStopSearchesIngestionService, Test_Proj.Services.StopSearches.StopSearchesIngestionService>();
 builder.Services.AddScoped<IForcesIngestionService, ForcesIngestionService>();
 builder.Services.AddScoped<Test_Proj.Services.Crimes.ICrimesIngestionService, Test_Proj.Services.Crimes.CrimesIngestionService>();
@@ -38,6 +39,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 app.UseMiddleware<IngestionErrorMiddleware>();
+app.UseMiddleware<SyncOriginMiddleware>();
 app.UseMiddleware<IngestionLimitsMiddleware>();
 
 // Configure the HTTP request pipeline.
@@ -47,6 +49,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["Content-Security-Policy"] = "default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; frame-ancestors 'none'; base-uri 'none'";
+    if (context.Request.Path.StartsWithSegments("/api/data")) context.Response.Headers.CacheControl = "no-store";
+    await next();
+});
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseAuthorization();
 
