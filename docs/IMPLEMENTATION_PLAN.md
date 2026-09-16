@@ -12,7 +12,7 @@ Planning is separate from the eight implementation stages below. Runtime status 
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | COMPLETED |
-| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | IN PROGRESS |
+| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | COMPLETED |
 
 ## Common definition of done
 
@@ -195,7 +195,7 @@ dotnet build "Test Proj.slnx" --no-restore
 
 ## Stage 9: PostgreSQL persistence, data sync and simple frontend
 
-- Status at planning: NOT STARTED (requested after Stage 8 completion).
+- Status: COMPLETED; implementation, verification and remote evidence recorded in WORK_PROGRESS.md.
 - Objective: Add PostgreSQL persistence through EF Core migrations, synchronize the existing Police API data into the database, expose persisted-data and synchronization APIs, and add a lightweight static single-page frontend.
 - Branch: `stage/09-postgres-sync-frontend`.
 - Prerequisites: Stage 8 COMPLETED with verified implementation and receipt pushes; local PostgreSQL and User Secrets are operator prerequisites and must never be exposed or read for proof.

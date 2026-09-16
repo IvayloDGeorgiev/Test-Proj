@@ -30,7 +30,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
 | 8 | Integration and final verification | stage/08-integration-verification | COMPLETED |
-| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | IN PROGRESS |
+| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | COMPLETED |
 
 ## Dispatch ledger
 
@@ -246,7 +246,7 @@ Dispatch key: Test-Proj:stage-09. State: CREATED (worktree setup queued). Target
 
 ## Stage 9: PostgreSQL persistence, data sync and simple frontend
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/09-postgres-sync-frontend
 - Owner/task ID: 01a0a9ee-bec8-7613-b17f-37c3c68f3c5d; dispatch key Test-Proj:stage-09.
 - Base SHA: 0261c212fa8b90a93b625029442ea8f295dc55b5.
@@ -263,5 +263,8 @@ Dispatch key: Test-Proj:stage-09. State: CREATED (worktree setup queued). Target
 - Issues/investigation/fixes: Initial build found EF runtime/relational transitive 10.0.4 versus design 10.0.12 conflicts; pinned direct Relational 10.0.12, then restore/build passed without warnings. Initial tests referenced nonexistent fake-handler Count/Requests members; corrected to its actual Calls property. First isolated PostgreSQL run started successfully but hung draining inherited pg_ctl output handles; stopped that test run, bounded output draining and closed redirected readers after process exit; targeted/full reruns passed. A patch with duplicate file operations was rejected without changes and reapplied correctly. All observed issues resolved; no assertions removed/weakened or tests skipped.
 - Review/decisions: Existing net10.0 solution/controller/namespace and ingestion controls retained. Reviewed official Npgsql provider and Police crime/stop contracts on 2026-09-16. No stable stop/search event ID exists; query snapshots retain indistinguishable occurrences and document overlap limitations. Crime identity promotion handles missing-to-present persistent IDs; loss/change of every identifier cannot be reliably reconciled and is documented. Atomic DB commit can have an uncertain acknowledgment on network loss; read/repeat is safe. Requirements R21 records Stage 9 extension and the handoff's operator-only private database verification boundary. README, architecture, security, test strategy and implementation plan updated. No local settings/credentials were read, copied or committed; no actual connection strings are in source/tests/docs/assets. Only synthetic connection settings are built in memory by the fixture.
 - Operator verification: Applying migrations to the private configured database and live Police API smoke tests were NOT performed; README provides explicit operator commands and checks. Isolated local PostgreSQL migration/runtime verification above passed independently.
-- Implementation commit and verified push: pending; status stays IN PROGRESS until successful remote verification and documentation receipt.
+- Implementation commit: 2dd3275619c5b56198b293c8b39dfacec0217689.
+- Implementation push evidence: git push origin stage/09-postgres-sync-frontend succeeded on 2026-09-16; separate git ls-remote origin refs/heads/stage/09-postgres-sync-frontend returned exactly 2dd3275619c5b56198b293c8b39dfacec0217689, matching git rev-parse HEAD.
+- Completion receipt: this documentation-only commit records the successful implementation gate. Its push must also be independently verified; Git history supplies its SHA. Final dispatch state COMPLETED for Test-Proj:stage-09; no successor requested or created.
+- Final review: staged file inventory, safe source/migration diff, documentation, requirements and git diff --cached --check reviewed. Local configuration ignored/untracked and absent from index before each commit. Pattern scan found only synthetic NpgsqlConnectionStringBuilder host/database assignments in the isolated test fixture, no credential/connection literals. Working tree was clean after implementation commit. No merge to develop/main performed.
 - Next stage: none; final requested stage.
