@@ -39,6 +39,8 @@ Dispatch key: Test-Proj:stage-02. State: CREATED (worktree setup queued). Target
 
 Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target: Stage 3 only, fresh isolated worktree from stage/02-police-api-client. Verified completion receipt: f0c8acef1c685202438155c318b4b333349ccd8b; implementation: 2f332dcfaafbc201097735abf6d8a8cfa068bcd5. Both pushes verified using git ls-remote on 2026-09-16. Coordinator: Stage 2 task 01a0a98c-d3a2-7141-bd2a-4c419d020287. Duplicate check: no Stage 3 task in current task listing, no dispatch ledger entry and no remote Stage 3 branch. Client task ID: client-new-thread:d74b0ce3-bf15-432f-adf3-3da78bb99bb8. Created UTC: 2026-09-16T09:44:03.5195631Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
+Dispatch key: Test-Proj:stage-04. State: PENDING. Target: Stage 4 only, fresh isolated worktree from stage/03-csv-export. Verified completion receipt: ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14; implementation: 293f05452e8227b9cf5905bc1e7146150cbb7592. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 3 task 01a0a999-d57c-7b93-b023-3c6fe240fff2. Duplicate check: no Stage 4 task in current task listing, no prior dispatch ledger entry and no remote Stage 4 branch. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
+
 ## Stage 1: Project and test foundation
 
 - Status: COMPLETED
