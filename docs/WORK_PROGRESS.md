@@ -28,7 +28,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
-| 7 | API limits and operational contracts | stage/07-api-hardening | IN PROGRESS |
+| 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
 ## Dispatch ledger
@@ -193,16 +193,16 @@ Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target
 
 ## Stage 7: API limits and operational contracts
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/07-api-hardening
 - Prerequisites: Stage 6 completed and remote receipt verified
 - Owner/task ID: 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1 (dispatch client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371)
 - Base SHA: 39b5a5b2338836cd6502a42fdc62d55cf5b9d839; remote predecessor implementation/receipt ancestry verified; final dispatch reconciled; no competing owner or branch.
 - Started (UTC): 2026-09-16T10:29:56.0168317Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Scoped implementation and review complete; targeted/full tests and build passed. Status remains IN PROGRESS pending implementation push and receipt. Claim f607515568fb6ffaf97dc7ba0c354ea490c8b8a1 pushed and independently verified.
+- Completed (UTC): 2026-09-16T10:40:28.5308931Z
+- Commit SHA (implementation): 8162d90dfe04b956847c455057d5fb7c57b47950
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/07-api-hardening returned exactly 8162d90dfe04b956847c455057d5fb7c57b47950. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Scoped implementation and review complete; targeted/full tests and build passed. Implementation push independently verified; this receipt records completion. Claim f607515568fb6ffaf97dc7ba0c354ea490c8b8a1 pushed and independently verified.
 - Functionality implemented: Bounded request pre-read and server size feature; whole-operation TimeProvider deadline through export I/O; isolated ambient remaining budget for GET retry admission; caller/deadline distinction and post-publication caller token restoration; sanitized framework 400/415 and validation errors; stable 413/504 codes; safe structured result/error logs; OpenAPI statuses/types/problem media metadata on all three routes. Shared global admission audited without changing service/export retry semantics.
 - Tests added: 41 genuine AAA Api cases with real middleware/filter/transport/services/exporter and fake HTTP/I/O boundaries. Known/unknown-length input at/over limit and bounded reads; writable server feature; reduced/snapshotted bytes/time; deadline during input/export and caller cancellation; old-file/cleanup/lease safety; publication commit point and response token; remaining retry delay budget; all three datasets blocking every other route; error/status/synthetic-sensitive-string matrix; validation/media-type sanitization; OpenAPI status/type/content type metadata; upstream byte/row limits; cleanup failure primary-error preservation; cancellation during response writes/already-started response; concurrent request budget isolation.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Api --no-restore PASSED exit 0, 446 passed, 0 failed/skipped (Api occurs in every test namespace). Exact new-group filter FullyQualifiedName~Tests.Api PASSED exit 0, 41 passed, 0 failed/skipped, including final sanitization and content-type regressions.
