@@ -47,6 +47,8 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 
 Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target: Stage 7 only, fresh isolated worktree from stage/06-stop-search-ingestion. Verified completion receipt: 8cbb6ac4e87bfe332b47b33b0f7e28ad82e08025; implementation: 196d3078f9e9c69d2c7e980699acb6a1f22717d0. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 6 task 01a0a9b9-f769-7d50-8769-d6d65bfa083e. Duplicate check: no Stage 7 task in current task listing, no prior dispatch ledger entry and no remote Stage 7 branch. Client task ID: client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371. Created UTC: 2026-09-16T10:28:58.2513128Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
+Dispatch key: Test-Proj:stage-08. State: PENDING. Target: Stage 8 only, fresh isolated worktree from stage/07-api-hardening. Verified completion receipt: bb387b09fc168f36a5e70467a0097db2d2a1bcb1; implementation: 8162d90dfe04b956847c455057d5fb7c57b47950. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 7 task 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1. Duplicate check: no Stage 8 task in current task listing, no prior dispatch ledger entry and no remote Stage 8 branch. Child must reconcile latest remote predecessor dispatch ledger before claiming work. Stage 8 is final: no successor.
+
 ## Stage 1: Project and test foundation
 
 - Status: COMPLETED
