@@ -25,7 +25,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
-| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
+| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | IN PROGRESS |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
@@ -115,16 +115,16 @@ Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target
 
 ## Stage 4: Forces ingestion endpoint
 
-- Status: NOT STARTED
+- Status: IN PROGRESS
 - Branch: stage/04-forces-ingestion
 - Prerequisites: Stage 3 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
+- Owner/task ID: 01a0a9a8-5ee4-7450-b19c-a0aaba75e2a8 (dispatch client-new-thread:ae0dfc0a-8c2a-4c19-bbb4-789cc138d7cd)
+- Base SHA: c44155ec5deeb8f340fe1603214d963c1ee32b67; predecessor implementation 293f05452e8227b9cf5905bc1e7146150cbb7592 and receipt ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14 ancestry and remote tip verified; coordinator dispatch update reconciled.
+- Started (UTC): 2026-09-16T10:00:49.5592072Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
+- Summary: Claimed isolated Stage 4 work after remote prerequisite and duplicate checks.
 - Functionality implemented: None.
 - Tests added: None.
 - Targeted test result: NOT RUN.
