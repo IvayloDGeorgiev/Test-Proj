@@ -1,0 +1,228 @@
+# Work progress
+
+This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, IN PROGRESS, BLOCKED, COMPLETED. A local COMPLETED label is insufficient without remote gate evidence (WORKFLOW.md).
+
+## Planning inspection — 2026-09-16
+
+- Planning status: IN PROGRESS; documentation prepared, commit/push pending.
+- Branch intended: docs/project-planning.
+- Baseline: main, commit 55f0bb2; working tree clean.
+- Existing solution: Test Proj.slnx; app: Test Proj/Test Proj.csproj; net10.0; namespace Test_Proj; SDK 10.0.401.
+- Existing source: WeatherForecast template only. No ingestion or test projects.
+- Build: `dotnet build "Test Proj.csproj" --no-restore` from application directory PASSED, exit 0, zero warnings/errors on 2026-09-16.
+- Tests: NOT RUN; none exist; this planning task must not implement tests.
+- Local configuration: ignored by repository .gitignore and untracked. Contents not inspected. No source/build configuration edits planned.
+- Issue identified: local provider is added after builder.Build(). Stage 1 moves it earlier and tests precedence using synthetic values.
+- Decision: preserve physical app/solution names; add only necessary test project in Stage 1. Eight sequential stages with security alongside each feature. Separate POSTs; /run deferred.
+- Planning checks: PASSED nine required documents, local links, exact eight-stage names/order and requirement/architecture/test/security consistency review. Local secrets remain ignored and untracked; existing source diff is empty. Commit SHA and push evidence will be recorded only after actual success in a separate receipt.
+- Automatic task creation: available through this environment's task tools; optional Stage 1 dispatch has not occurred.
+- Planning next stage: Stage 1, only after planning push.
+
+## Stage index
+
+| Stage | Name | Branch | Status |
+| --- | --- | --- | --- |
+| 1 | Project and test foundation | stage/01-project-foundation | NOT STARTED |
+| 2 | Police API transport and validation | stage/02-police-api-client | NOT STARTED |
+| 3 | Safe CSV and file export | stage/03-csv-export | NOT STARTED |
+| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
+| 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
+| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
+| 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
+| 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
+
+## Dispatch ledger
+
+No tasks dispatched. No stage owner. Before dispatch follow WORKFLOW.md; record dispatch key, predecessor tip, PENDING/CREATED/BLOCKED state, task identity and UTC timestamp. Do not assume absence here proves no task exists; inspect tool state.
+
+## Stage 1: Project and test foundation
+
+- Status: NOT STARTED
+- Branch: stage/01-project-foundation
+- Prerequisites: planning committed and pushed
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 2: Police API transport and validation
+
+## Stage 2: Police API transport and validation
+
+- Status: NOT STARTED
+- Branch: stage/02-police-api-client
+- Prerequisites: Stage 1 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 3: Safe CSV and file export
+
+## Stage 3: Safe CSV and file export
+
+- Status: NOT STARTED
+- Branch: stage/03-csv-export
+- Prerequisites: Stage 2 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 4: Forces ingestion endpoint
+
+## Stage 4: Forces ingestion endpoint
+
+- Status: NOT STARTED
+- Branch: stage/04-forces-ingestion
+- Prerequisites: Stage 3 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 5: Crime ingestion endpoint
+
+## Stage 5: Crime ingestion endpoint
+
+- Status: NOT STARTED
+- Branch: stage/05-crime-ingestion
+- Prerequisites: Stage 4 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 6: Stop-and-search ingestion endpoint
+
+## Stage 6: Stop-and-search ingestion endpoint
+
+- Status: NOT STARTED
+- Branch: stage/06-stop-search-ingestion
+- Prerequisites: Stage 5 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 7: API limits and operational contracts
+
+## Stage 7: API limits and operational contracts
+
+- Status: NOT STARTED
+- Branch: stage/07-api-hardening
+- Prerequisites: Stage 6 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: 8: Integration and final verification
+
+## Stage 8: Integration and final verification
+
+- Status: NOT STARTED
+- Branch: stage/08-integration-verification
+- Prerequisites: Stage 7 completed and remote receipt verified
+- Owner/task ID: —
+- Base SHA: —
+- Started (UTC): —
+- Completed (UTC): —
+- Commit SHA (implementation): —
+- Push evidence / receipt: —
+- Summary: Planned; no implementation performed.
+- Functionality implemented: None.
+- Tests added: None.
+- Targeted test result: NOT RUN.
+- Full test result: NOT RUN.
+- Build result: NOT RUN for this stage.
+- Issues encountered / investigation: None yet.
+- Root cause: —
+- Resolution: —
+- Regression test: —
+- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Next stage: None; report final completion
