@@ -10,6 +10,7 @@
 6. Stop-and-search ingestion endpoint — `stage/06-stop-search-ingestion`
 7. API limits and operational contracts — `stage/07-api-hardening`
 8. Integration and final verification — `stage/08-integration-verification`
+9. PostgreSQL persistence, data sync and simple frontend — `stage/09-postgres-sync-frontend`
 
 Names/order mirror IMPLEMENTATION_PLAN.md and WORK_PROGRESS.md. This planning task implements none of them.
 
@@ -64,7 +65,7 @@ After the entire gate, inspect existing tasks for this repo/stage and the progre
 
 Record returned task/client ID and timestamp in progress, commit/push a dispatch-only update. A child created before that ledger update must inspect origin's predecessor branch and existing task state before claiming work. Task records and the branch claim jointly prevent duplicate implementation. If creation times out or result is ambiguous, inspect tasks using the dispatch key; do not blindly retry. If still uncertain, mark dispatch BLOCKED for manual reconciliation. A pending worktree client ID is not a usable thread ID.
 
-Never queue N+2/N+3. No guessed durations or recurring timer substitutes for dependency gates. If only scheduling is available, schedule ONE standalone next task for earliest practical time after success. If unavailable, record manual handoff, output the prompt and stop. Task creation failure does not undo completed code but blocks automated handoff. Stage 8 has no successor.
+Never queue N+2/N+3. No guessed durations or recurring timer substitutes for dependency gates. If only scheduling is available, schedule ONE standalone next task for earliest practical time after success. If unavailable, record manual handoff, output the prompt and stop. Task creation failure does not undo completed code but blocks automated handoff. Stage 9 is the current final requested stage.
 
 ### Handoff prompt template
 

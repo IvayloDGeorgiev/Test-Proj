@@ -29,7 +29,8 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
-| 8 | Integration and final verification | stage/08-integration-verification | IN PROGRESS |
+| 8 | Integration and final verification | stage/08-integration-verification | COMPLETED |
+| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | NOT STARTED |
 
 ## Dispatch ledger
 
@@ -47,7 +48,9 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 
 Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target: Stage 7 only, fresh isolated worktree from stage/06-stop-search-ingestion. Verified completion receipt: 8cbb6ac4e87bfe332b47b33b0f7e28ad82e08025; implementation: 196d3078f9e9c69d2c7e980699acb6a1f22717d0. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 6 task 01a0a9b9-f769-7d50-8769-d6d65bfa083e. Duplicate check: no Stage 7 task in current task listing, no prior dispatch ledger entry and no remote Stage 7 branch. Client task ID: client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371. Created UTC: 2026-09-16T10:28:58.2513128Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
-Dispatch key: Test-Proj:stage-08. State: CREATED (worktree setup queued). Target: Stage 8 only, fresh isolated worktree from stage/07-api-hardening. Verified completion receipt: bb387b09fc168f36a5e70467a0097db2d2a1bcb1; implementation: 8162d90dfe04b956847c455057d5fb7c57b47950. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 7 task 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1. Duplicate check: no Stage 8 task in current task listing, no prior dispatch ledger entry and no remote Stage 8 branch. Client task ID: client-new-thread:3495f7ec-a2b1-43c0-8de7-8081ccfe968a. Created UTC: 2026-09-16T10:41:39.5092892Z. Resolve actual task ID before using task-inspection tools. Child must reconcile latest remote predecessor dispatch ledger before claiming work. Stage 8 is final: no successor.
+Dispatch key: Test-Proj:stage-08. State: COMPLETED. Target: Stage 8 only; implementation 152a766a5aadb570325cbe2cda6a59c937c88574 and receipt fb7059169ac43c4331300307a9f48b37c8be8a43 independently verified on 2026-09-16.
+
+Dispatch key: Test-Proj:stage-09. State: PENDING. Target: Stage 9 only, isolated worktree from stage/08-integration-verification. Verified predecessor receipt: fb7059169ac43c4331300307a9f48b37c8be8a43; implementation: 152a766a5aadb570325cbe2cda6a59c937c88574. Coordinator: Stage 8 task 01a0a9ce-9bae-7f12-ab38-4d74e1db8172. Duplicate check: no Stage 9 task or branch found before this dispatch. Stage 9 is the current final requested stage; no successor should be created.
 
 ## Stage 1: Project and test foundation
 
@@ -239,4 +242,4 @@ Dispatch key: Test-Proj:stage-08. State: CREATED (worktree setup queued). Target
 - Resolution: Made crime/stop request parameters nonnullable while retaining defensive nullable service contracts; added strict JsonNumberHandling metadata to RecordCount; asserted aborted response stream semantics and fixed test sink signaling. Retargeted OpenAPI and cancellation regressions passed.
 - Regression test: HostFailureTests.OpenApi_Development_GeneratedDocumentDescribesActualRoutesSchemasAndMediaTypes; HostCancellationTests.Cancellation_UpstreamPending_DistinguishesAttemptDeadlineAndCaller; Input_PendingRead_ConsumesOperationBudgetAndPropagatesCallerCancellation.
 - Notes / decisions: Audited R1-R20 against REQUIREMENTS/ARCHITECTURE/SECURITY; no live Police API, real Desktop or local settings. TestServer does not claim deployment TLS/reverse-proxy/OS ownership behavior. Documentation now includes setup, examples, OpenAPI access, test command and operator boundaries.
-- Next stage: None; Stage 8 is final.
+- Next stage: 9: PostgreSQL persistence, data sync and simple frontend (requested; dispatch pending).

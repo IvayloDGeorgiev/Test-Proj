@@ -11,7 +11,8 @@ Planning is separate from the eight implementation stages below. Runtime status 
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
-| 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
+| 8 | Integration and final verification | stage/08-integration-verification | COMPLETED |
+| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | NOT STARTED |
 
 ## Common definition of done
 
@@ -191,6 +192,20 @@ dotnet build "Test Proj.slnx" --no-restore
 - Acceptance criteria: Every requirement has evidence; full suite/build pass; README contains accurate setup/examples; no ingestion gaps hidden by tests.
 - Expected coherent commit: `test: verify ingestion contracts end to end`; optional separate meaningful regression increment, then documentation receipt.
 - Completion criteria / definition of done: stage acceptance plus the entire common gate, verified remote receipt and durable evidence. Only then dispatch no successor (project stages finished).
+
+## Stage 9: PostgreSQL persistence, data sync and simple frontend
+
+- Status at planning: NOT STARTED (requested after Stage 8 completion).
+- Objective: Add PostgreSQL persistence through EF Core migrations, synchronize the existing Police API data into the database, expose persisted-data and synchronization APIs, and add a lightweight static single-page frontend.
+- Branch: `stage/09-postgres-sync-frontend`.
+- Prerequisites: Stage 8 COMPLETED with verified implementation and receipt pushes; local PostgreSQL and User Secrets are operator prerequisites and must never be exposed or read for proof.
+- Relevant components/files: EF Core/Npgsql registration, persistence DbContext/entities/migrations; synchronization service and API contracts/controllers; static frontend assets; persistence/integration tests; README, architecture, workflow, progress and security docs.
+- Implementation tasks: Inspect existing contracts; add compatible EF Core/Npgsql packages; configure `ConnectionStrings:DefaultConnection`; create/apply migrations without manual tables; implement idempotent insert/update synchronization with safe metadata; add persisted-data and sync endpoints; add static HTML/CSS/JavaScript with disabled repeated sync, loading/error/empty states and refresh after success; preserve existing ingestion routes and security controls.
+- Required AAA tests: Model/migration constraints; synchronization insert/update/no-duplicate behavior with isolated test infrastructure that never uses private User Secrets; API contracts and frontend asset/state behavior where testable.
+- Edge/error tests: Missing/invalid configuration without disclosure; database unavailable/timeout/constraint failures; partial upstream data and repeated sync; concurrent sync admission; empty data; no credentials in static assets, logs, docs or staged files.
+- Acceptance criteria: EF Core/Npgsql configured; schema represented by migrations and applied successfully to the configured local database; external data synchronizes idempotently; persisted data is retrievable; frontend displays and refreshes it safely; all prior tests/build pass; no secrets enter tests or Git.
+- Expected coherent commit: `feat: add PostgreSQL persistence and sync frontend`, followed by the documentation-only completion receipt.
+- Completion criteria / definition of done: Common WORKFLOW gate plus migration/runtime verification, implementation and receipt pushes. Stage 9 is the current final requested stage unless explicitly extended.
 
 Verification commands:
 
