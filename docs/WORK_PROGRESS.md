@@ -24,7 +24,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | --- | --- | --- | --- |
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
-| 3 | Safe CSV and file export | stage/03-csv-export | IN PROGRESS |
+| 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
@@ -89,16 +89,16 @@ Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target
 
 ## Stage 3: Safe CSV and file export
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/03-csv-export
 - Prerequisites: Stage 2 completed and remote receipt verified
 - Owner/task ID: 01a0a999-d57c-7b93-b023-3c6fe240fff2 (dispatch client-new-thread:d74b0ce3-bf15-432f-adf3-3da78bb99bb8)
 - Base SHA: 18453db9561b0800dea90e827bea07934e59f256; predecessor implementation 2f332dcfaafbc201097735abf6d8a8cfa068bcd5 and receipt f0c8acef1c685202438155c318b4b333349ccd8b ancestry and remote tip verified; coordinator dispatch update reconciled.
 - Started (UTC): 2026-09-16T09:44:36Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Stage 3 implementation and review finished; targeted/full tests and build pass. IN PROGRESS pending implementation push and separate completion receipt. Claim 45467d4d101a78d6a319c243d4e376b2adefa694 pushed and remote tip independently matched.
+- Completed (UTC): 2026-09-16T09:58:21Z
+- Commit SHA (implementation): 293f05452e8227b9cf5905bc1e7146150cbb7592
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/03-csv-export returned exactly 293f05452e8227b9cf5905bc1e7146150cbb7592. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Stage 3 implementation, review, targeted/full tests and build passed; implementation push independently verified. This receipt records the completion gate. Claim 45467d4d101a78d6a319c243d4e376b2adefa694 pushed and remote tip independently matched.
 - Functionality implemented: Strict BOM-free UTF-8/CRLF CSV; exact code-owned schemas and validated-month filenames; formula-protected text, separate invariant finite numeric/boolean/offset timestamp cells; singleton immediate operation lease with same-lease write exclusion; root/path containment and link/reparse checks before writes and publication; unique exclusive same-directory temporary files; flush/close then atomic move/replace; preservation of prior files, cancellation propagation, sanitized failures and safe cleanup warnings. Registered reusable export services only; no ingestion endpoint added.
 - Tests added: 66 genuine AAA Stage 3 cases covering exact escaping/formula/Unicode/null records, schema/header order, culture/numbers/nonfinite values, filename traversal/absolute/UNC/sibling traps, actual Windows junctions and dangling/ancestor/destination links, root changes after startup and before publication, root-as-file, missing-root creation and immutable configuration snapshot, unique temp placement/closed handles, existing-reader atomic replacement, empty replacement, actual locked destination and injected permission/write/flush/publication failures, row/encoding failure, cancellation before/during writes/after last row/at commit point, cleanup error sanitization, singleton cross-scope admission, simultaneous contention, lease reuse/foreign/disposed/premature disposal and release.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Export --no-restore PASSED exit 0, 86 passed, 0 failed/skipped (66 new export + 20 matching prior foundation cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Export PASSED exit 0, 66 passed. Earlier incremental export runs passed 70 and 81 cases.
