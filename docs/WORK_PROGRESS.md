@@ -24,7 +24,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | --- | --- | --- | --- |
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
-| 3 | Safe CSV and file export | stage/03-csv-export | NOT STARTED |
+| 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
@@ -38,6 +38,8 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 Dispatch key: Test-Proj:stage-02. State: CREATED (worktree setup queued). Target: Stage 2 only, fresh isolated worktree from stage/01-project-foundation. Verified completion receipt: a0b9cad1e53a6fb4bde9cf69a483af9364714ebf; implementation: 5bcc1fb6936f7461b426d6575c9842f5e187c97c. Both pushes verified using git ls-remote on 2026-09-16. Coordinator: Stage 1 task 01a0a978-cc9f-7b53-84ef-c501ed284c0c. Duplicate check: no Stage 2 task in current task listing and no remote Stage 2 branch. Client task ID: client-new-thread:8b492d04-0bb3-499d-9f01-dacae6b5f238. Created UTC: 2026-09-16T09:29:51.4798685Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile this ledger on the latest remote predecessor before claiming work.
 
 Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target: Stage 3 only, fresh isolated worktree from stage/02-police-api-client. Verified completion receipt: f0c8acef1c685202438155c318b4b333349ccd8b; implementation: 2f332dcfaafbc201097735abf6d8a8cfa068bcd5. Both pushes verified using git ls-remote on 2026-09-16. Coordinator: Stage 2 task 01a0a98c-d3a2-7141-bd2a-4c419d020287. Duplicate check: no Stage 3 task in current task listing, no dispatch ledger entry and no remote Stage 3 branch. Client task ID: client-new-thread:d74b0ce3-bf15-432f-adf3-3da78bb99bb8. Created UTC: 2026-09-16T09:44:03.5195631Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
+
+Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target: Stage 4 only, fresh isolated worktree from stage/03-csv-export. Verified completion receipt: ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14; implementation: 293f05452e8227b9cf5905bc1e7146150cbb7592. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 3 task 01a0a999-d57c-7b93-b023-3c6fe240fff2. Duplicate check: no Stage 4 task in current task listing, no prior dispatch ledger entry and no remote Stage 4 branch. Client task ID: client-new-thread:ae0dfc0a-8c2a-4c19-bbb4-789cc138d7cd. Created UTC: 2026-09-16T09:59:37Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 ## Stage 1: Project and test foundation
 
@@ -89,26 +91,26 @@ Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target
 
 ## Stage 3: Safe CSV and file export
 
-- Status: NOT STARTED
+- Status: COMPLETED
 - Branch: stage/03-csv-export
 - Prerequisites: Stage 2 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Owner/task ID: 01a0a999-d57c-7b93-b023-3c6fe240fff2 (dispatch client-new-thread:d74b0ce3-bf15-432f-adf3-3da78bb99bb8)
+- Base SHA: 18453db9561b0800dea90e827bea07934e59f256; predecessor implementation 2f332dcfaafbc201097735abf6d8a8cfa068bcd5 and receipt f0c8acef1c685202438155c318b4b333349ccd8b ancestry and remote tip verified; coordinator dispatch update reconciled.
+- Started (UTC): 2026-09-16T09:44:36Z
+- Completed (UTC): 2026-09-16T09:58:21Z
+- Commit SHA (implementation): 293f05452e8227b9cf5905bc1e7146150cbb7592
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/03-csv-export returned exactly 293f05452e8227b9cf5905bc1e7146150cbb7592. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Stage 3 implementation, review, targeted/full tests and build passed; implementation push independently verified. This receipt records the completion gate. Claim 45467d4d101a78d6a319c243d4e376b2adefa694 pushed and remote tip independently matched.
+- Functionality implemented: Strict BOM-free UTF-8/CRLF CSV; exact code-owned schemas and validated-month filenames; formula-protected text, separate invariant finite numeric/boolean/offset timestamp cells; singleton immediate operation lease with same-lease write exclusion; root/path containment and link/reparse checks before writes and publication; unique exclusive same-directory temporary files; flush/close then atomic move/replace; preservation of prior files, cancellation propagation, sanitized failures and safe cleanup warnings. Registered reusable export services only; no ingestion endpoint added.
+- Tests added: 66 genuine AAA Stage 3 cases covering exact escaping/formula/Unicode/null records, schema/header order, culture/numbers/nonfinite values, filename traversal/absolute/UNC/sibling traps, actual Windows junctions and dangling/ancestor/destination links, root changes after startup and before publication, root-as-file, missing-root creation and immutable configuration snapshot, unique temp placement/closed handles, existing-reader atomic replacement, empty replacement, actual locked destination and injected permission/write/flush/publication failures, row/encoding failure, cancellation before/during writes/after last row/at commit point, cleanup error sanitization, singleton cross-scope admission, simultaneous contention, lease reuse/foreign/disposed/premature disposal and release.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Export --no-restore PASSED exit 0, 86 passed, 0 failed/skipped (66 new export + 20 matching prior foundation cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Export PASSED exit 0, 66 passed. Earlier incremental export runs passed 70 and 81 cases.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 231 passed, 0 failed/skipped (165 predecessor + 66 Stage 3). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: First targeted run passed but emitted CS8631 from a nullable Path.GetFileName method-group projection in an expected-filename assertion. Inspected overload inference. Review identified StreamWriter disposal could flush buffered text outside the explicit cancellation-aware write path; simplified to direct strict UTF-8 record writes. No failing tests or unresolved implementation defects occurred.
+- Root cause: Nullable method-group inference selected an assertion overload with incompatible nullable generic constraints. StreamWriter disposal introduces an implicit flush independent of the operation token.
+- Resolution: Use a lambda retaining nonnull flow for known filenames, preserving the exact expected filenames. Encode each record directly and pass the token to stream writes/flush; remove the extra text buffer. All targeted/full tests and build subsequently passed without warnings.
+- Regression test: Export_CodeOwnedSchemas_WritesExactHeaderOnlyFiles retains exact filenames/headers. Export_CancelledDuringFileWrite_PropagatesTokenAndCleansTemporary verifies actual pending stream I/O cancellation, token identity, old-file preservation and cleanup. Export_CancelledAfterLastRow_StopsBeforePublication covers the boundary after enumeration. Other fault/lease/path tests prove independently observable failure behavior.
+- Notes / decisions: R13-R17 and stage R19/R20 reviewed against requirements, architecture and security. Windows C volume is NTFS; real move/replace and old-reader behavior verified there. Root remains an operator-owned trust boundary; path checks do not eliminate malicious OS races. If a root changes into a link or deletion itself fails, cleanup refuses unsafe traversal and logs only export_cleanup_failed; operator may need to remove a leftover temp. Publication is the commit point; cancellation afterward cannot undo success. No packages added; net10.0 solution/namespace/template retained. Dataset mapping/endpoints and full-operation deadline remain in their assigned stages. README/architecture/security updated; no live HTTP, real Desktop or local configuration access. Local configuration remains ignored/untracked and was never read/copied; generated files use temporary test roots only.
 - Next stage: 4: Forces ingestion endpoint
 
 ## Stage 4: Forces ingestion endpoint
