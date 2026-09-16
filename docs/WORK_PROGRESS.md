@@ -27,7 +27,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
-| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | IN PROGRESS |
+| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
@@ -167,16 +167,16 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 
 ## Stage 6: Stop-and-search ingestion endpoint
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/06-stop-search-ingestion
 - Prerequisites: Stage 5 completed and remote receipt verified
 - Owner/task ID: 01a0a9b9-f769-7d50-8769-d6d65bfa083e (dispatch client-new-thread:0683b7e8-42fa-4535-86cc-95c66b23707f)
 - Base SHA: bdc4ec3bfeda54a96af6088af8756ced968b769b; predecessor implementation/receipt ancestry and remote tip verified; final dispatch update reconciled; no competing branch/task found.
 - Started (UTC): 2026-09-16T10:20:20.9086464Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Scoped implementation and review complete; all tests/build passed. Awaiting implementation push and completion receipt. Claim 7ebeb469247205c4dd36aab3bf3c569141fef303 pushed and independently verified.
+- Completed (UTC): 2026-09-16T10:27:46.3799122Z
+- Commit SHA (implementation): 196d3078f9e9c69d2c7e980699acb6a1f22717d0
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/06-stop-search-ingestion returned exactly 196d3078f9e9c69d2c7e980699acb6a1f22717d0. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Scoped implementation and review complete; all tests/build passed. Implementation push independently verified; this receipt records completion. Claim 7ebeb469247205c4dd36aab3bf3c569141fef303 pushed and independently verified.
 - Functionality implemented: POST /api/ingestion/stop-searches; code-owned stops-street location/month query; explicit optional demographics/location and nullable boolean mapping; required type/offset timestamp; documented outcome string/null/false support; exact StopSearches_YYYY-MM.csv schema; shared lease through publication, common safe result, validation and middleware.
 - Tests added: 74 genuine AAA StopSearches tests with fake HTTP/client/export boundaries and real transport/mapping/service/controller/middleware and temporary CSV output. Frozen official example, exact UTF-8/CRLF schema/query/culture/count, timestamp offsets/fractions, booleans/optional fields, outcome false/null/text, formula/Unicode/CSV escaping, invalid input zero side effects, invalid arrays/fields/defensive client records, empty replacement, contention during retrieval/export, token propagation/cancellation/publication commit point, timeout/status/size/row limits, publication failure old-file preservation and cleanup, safe validation response.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~StopSearches --no-restore PASSED exit 0, 74 passed, 0 failed/skipped. Initial 65-case run also passed.
@@ -186,7 +186,7 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 - Root cause: Preliminary lookup used an absent method-name marker; shell Set-Content appended an extra newline.
 - Resolution: Used the actual pending-retrieval method marker, reviewed generated tests and removed trailing blank lines. Full target suite, full suite and build passed.
 - Regression test: No application defect discovered. OutcomeContract tests explicitly cover the official false union; invalid timestamp cases prevent local-time inference.
-- Notes / decisions: Reviewed R2-R6/R8/R11/R13-R17/R19/R20 with architecture/security and official https://data.police.uk/docs/method/stops-street/ (2026-09-16). Explicit-offset ISO timestamps preserve up to seven fractional digits; no returned-month equality restriction added. Outcome false is accepted per official contract, other unexpected shapes rejected. Shared coordinate DTO validation reused. No packages added; net10.0 solution/application/namespace preserved. README/architecture/.http updated. Full-operation budgets/input limits remain Stage 7; host binding tests Stage 8. Local settings remain ignored/untracked and were never read/copied; tests use no live API or Desktop.
+- Notes / decisions: Reviewed R2-R6/R8/R11/R13-R17/R19/R20 with architecture/security and official https://data.police.uk/docs/method/stops-street/ (2026-09-16). Explicit-offset ISO timestamps preserve up to seven fractional digits; no returned-month equality restriction added. Outcome false is accepted per official contract, other unexpected shapes rejected. Shared coordinate DTO validation reused. No packages added; net10.0 solution/application/namespace preserved. README/architecture/.http updated. Full-operation budgets/input limits remain Stage 7; host binding tests Stage 8. Intended source/test/documentation staged diff and status reviewed; whitespace check passed; no generated exports included. Local settings remain ignored/untracked and were never read/copied; tests use no live API or Desktop.
 - Next stage: 7: API limits and operational contracts
 
 ## Stage 7: API limits and operational contracts
