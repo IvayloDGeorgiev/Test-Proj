@@ -176,17 +176,17 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Ownership claimed; implementing Stage 6 only.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Scoped implementation and review complete; all tests/build passed. Awaiting implementation push and completion receipt. Claim 7ebeb469247205c4dd36aab3bf3c569141fef303 pushed and independently verified.
+- Functionality implemented: POST /api/ingestion/stop-searches; code-owned stops-street location/month query; explicit optional demographics/location and nullable boolean mapping; required type/offset timestamp; documented outcome string/null/false support; exact StopSearches_YYYY-MM.csv schema; shared lease through publication, common safe result, validation and middleware.
+- Tests added: 74 genuine AAA StopSearches tests with fake HTTP/client/export boundaries and real transport/mapping/service/controller/middleware and temporary CSV output. Frozen official example, exact UTF-8/CRLF schema/query/culture/count, timestamp offsets/fractions, booleans/optional fields, outcome false/null/text, formula/Unicode/CSV escaping, invalid input zero side effects, invalid arrays/fields/defensive client records, empty replacement, contention during retrieval/export, token propagation/cancellation/publication commit point, timeout/status/size/row limits, publication failure old-file preservation and cleanup, safe validation response.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~StopSearches --no-restore PASSED exit 0, 74 passed, 0 failed/skipped. Initial 65-case run also passed.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 405 passed, 0 failed/skipped (331 predecessor + 74 new). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: An unused preliminary test-scaffolding substring lookup emitted an index error; the subsequent correct lookup generated the intended test file. Inspected resulting code and compilation/discovery. Diff check found trailing blank lines introduced by shell writes. No test/build failures.
+- Root cause: Preliminary lookup used an absent method-name marker; shell Set-Content appended an extra newline.
+- Resolution: Used the actual pending-retrieval method marker, reviewed generated tests and removed trailing blank lines. Full target suite, full suite and build passed.
+- Regression test: No application defect discovered. OutcomeContract tests explicitly cover the official false union; invalid timestamp cases prevent local-time inference.
+- Notes / decisions: Reviewed R2-R6/R8/R11/R13-R17/R19/R20 with architecture/security and official https://data.police.uk/docs/method/stops-street/ (2026-09-16). Explicit-offset ISO timestamps preserve up to seven fractional digits; no returned-month equality restriction added. Outcome false is accepted per official contract, other unexpected shapes rejected. Shared coordinate DTO validation reused. No packages added; net10.0 solution/application/namespace preserved. README/architecture/.http updated. Full-operation budgets/input limits remain Stage 7; host binding tests Stage 8. Local settings remain ignored/untracked and were never read/copied; tests use no live API or Desktop.
 - Next stage: 7: API limits and operational contracts
 
 ## Stage 7: API limits and operational contracts

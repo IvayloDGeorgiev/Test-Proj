@@ -391,6 +391,7 @@ public sealed class CrimesTests
         public LocationMonth? Query { get; private set; }
         public Task<IReadOnlyList<CrimeDto>> GetCrimesAsync(LocationMonth request, CancellationToken cancellationToken = default)
         { Calls++; Query = request; Token = cancellationToken; return OnGet?.Invoke(cancellationToken) ?? Task.FromResult(Records); }
+        public Task<IReadOnlyList<StopSearchDto>> GetStopSearchesAsync(Test_Proj.Validation.LocationMonth request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<IReadOnlyList<ForceDto>> GetForcesAsync(CancellationToken cancellationToken = default) => throw new NotSupportedException();
     }
     private sealed class Service(IngestionResult result) : ICrimesIngestionService

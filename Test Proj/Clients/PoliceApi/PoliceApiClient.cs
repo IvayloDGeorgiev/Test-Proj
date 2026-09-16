@@ -43,6 +43,14 @@ public sealed class PoliceApiClient : IPoliceApiClient
             (CrimeDto crime) => crime.IsValid(request.Month), cancellationToken);
     }
 
+    public Task<IReadOnlyList<StopSearchDto>> GetStopSearchesAsync(Test_Proj.Validation.LocationMonth request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return GetArrayAsync("stops-street?" + request.ToQueryString(), "stop-searches",
+            (StopSearchDto stop) => stop.IsValid(), cancellationToken);
+    }
+
     // Code-owned paths only. Dataset methods added in their own stages call this single retry owner.
     private async Task<IReadOnlyList<T>> GetArrayAsync<T>(string path, string dataset, Func<T, bool> validate,
         CancellationToken caller) where T : class
