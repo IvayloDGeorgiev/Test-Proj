@@ -25,7 +25,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
-| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
+| 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
@@ -40,6 +40,8 @@ Dispatch key: Test-Proj:stage-02. State: CREATED (worktree setup queued). Target
 Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target: Stage 3 only, fresh isolated worktree from stage/02-police-api-client. Verified completion receipt: f0c8acef1c685202438155c318b4b333349ccd8b; implementation: 2f332dcfaafbc201097735abf6d8a8cfa068bcd5. Both pushes verified using git ls-remote on 2026-09-16. Coordinator: Stage 2 task 01a0a98c-d3a2-7141-bd2a-4c419d020287. Duplicate check: no Stage 3 task in current task listing, no dispatch ledger entry and no remote Stage 3 branch. Client task ID: client-new-thread:d74b0ce3-bf15-432f-adf3-3da78bb99bb8. Created UTC: 2026-09-16T09:44:03.5195631Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target: Stage 4 only, fresh isolated worktree from stage/03-csv-export. Verified completion receipt: ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14; implementation: 293f05452e8227b9cf5905bc1e7146150cbb7592. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 3 task 01a0a999-d57c-7b93-b023-3c6fe240fff2. Duplicate check: no Stage 4 task in current task listing, no prior dispatch ledger entry and no remote Stage 4 branch. Client task ID: client-new-thread:ae0dfc0a-8c2a-4c19-bbb4-789cc138d7cd. Created UTC: 2026-09-16T09:59:37Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
+
+Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target: Stage 5 only, fresh isolated worktree from stage/04-forces-ingestion. Verified completion receipt: f646c9a2dc983b9bd35fa4877af16156527b08ad; implementation: 2d396373206fdc526f212d09f7d209097ab1fba1. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 4 task 01a0a9a8-5ee4-7450-b19c-a0aaba75e2a8. Duplicate check: no Stage 5 task in current task listing, no prior dispatch ledger entry and no remote Stage 5 branch. Client task ID: client-new-thread:b02bd110-786d-42bf-ba17-1b4f3006e9d9. Created UTC: 2026-09-16T10:09:12.5414669Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 ## Stage 1: Project and test foundation
 
@@ -115,26 +117,26 @@ Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target
 
 ## Stage 4: Forces ingestion endpoint
 
-- Status: NOT STARTED
+- Status: COMPLETED
 - Branch: stage/04-forces-ingestion
 - Prerequisites: Stage 3 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Owner/task ID: 01a0a9a8-5ee4-7450-b19c-a0aaba75e2a8 (dispatch client-new-thread:ae0dfc0a-8c2a-4c19-bbb4-789cc138d7cd)
+- Base SHA: c44155ec5deeb8f340fe1603214d963c1ee32b67; predecessor implementation 293f05452e8227b9cf5905bc1e7146150cbb7592 and receipt ec4cbc17f6ce5dbfe5e485ca59d83c57b5e99d14 ancestry and remote tip verified; coordinator dispatch update reconciled.
+- Started (UTC): 2026-09-16T10:00:49.5592072Z
+- Completed (UTC): 2026-09-16T10:08:03.7113434Z
+- Commit SHA (implementation): 2d396373206fdc526f212d09f7d209097ab1fba1
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/04-forces-ingestion returned exactly 2d396373206fdc526f212d09f7d209097ab1fba1. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Stage 4 implemented and reviewed; restore, targeted/full tests and build passed. Implementation push independently verified; this receipt records completion. Claim 0761388f4e7afac0ca65ef06b52105e9bd794a54 pushed and independently verified.
+- Functionality implemented: POST /api/ingestion/forces; scoped service with eager required id/name validation and explicit text-cell mapping; shared lease acquired before retrieval and held through publication; common safe success metadata with exported count, code-owned filename and UTC completion time; centralized sanitized ProblemDetails with stable codes/trace IDs, safe logs and disconnected-caller handling. Empty/repeated export replacement uses the existing atomic exporter. Removed WeatherForecast model/controller and updated HTTPS .http example.
+- Tests added: 36 genuine AAA forces tests using fake client/export/service boundaries with real mapping/service/controller/middleware, plus real temporary-directory exports. Frozen official fixture, exact header/order/UTF-8/escaping/formula protection, counts/result shape, repeated/empty replacement, null/blank required records, no export after invalid data, retrieval/publication contention, token propagation, cancellation before/during/after retrieval and during export, publication commit point, write failure/preservation/cleanup/lease release, controller interaction/failure, all upstream failure categories and safe arbitrary exception/code handling, disconnected caller and response/log sanitization.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Forces --no-restore PASSED exit 0, 109 passed, 0 failed/skipped (36 new + 73 existing forces transport cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Forces PASSED exit 0, 36 passed.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 267 passed, 0 failed/skipped (231 predecessor + 36 Stage 4). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial patch tool rejected duplicate delete/add operations for the .http path before applying changes; used one update operation instead. No test/build failures or unresolved implementation defects. Review noted ExportException exposes arbitrary code/status constructor values, so HTTP translation must not echo them.
+- Root cause: Patch operation format restriction; open exception string/status boundary could disclose data if reflected directly.
+- Resolution: Applied the .http edit as an update. Error middleware allowlists contention and maps all other export exceptions to safe export_failed/500; never logs exception objects or messages.
+- Regression test: Errors_ClassifiedFailure_ReturnsSafeProblemAndSafeLog includes a synthetic sensitive path in an ExportException with status 200 and verifies safe 500, no secret/path disclosure in JSON/logs, and no logged exception object.
+- Notes / decisions: Reviewed Stage 4 R2-R4/R11 and R19/R20 with architecture/security; preserved net10.0 solution/namespace and existing transport/export contracts. Official forces documentation rechecked 2026-09-16 at https://data.police.uk/docs/method/forces/: id/name, British Transport Police excluded. Example frozen in tests. No packages added. HTTP middleware handles both environments and avoids raw diagnostic exception logging; arbitrary cancellation without caller cancellation is an internal failure. Full-operation timeout/input limits and completed operational logs remain Stage 7, host integration Stage 8. README/architecture updated. Tests never contact live Police API, use real Desktop or read local settings. Ignored local configuration remains untracked and was not read/copied. Safe explicit diff/status/secret review completed; no generated exports staged.
 - Next stage: 5: Crime ingestion endpoint
 
 ## Stage 5: Crime ingestion endpoint
