@@ -22,7 +22,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 
 | Stage | Name | Branch | Status |
 | --- | --- | --- | --- |
-| 1 | Project and test foundation | stage/01-project-foundation | NOT STARTED |
+| 1 | Project and test foundation | stage/01-project-foundation | IN PROGRESS |
 | 2 | Police API transport and validation | stage/02-police-api-client | NOT STARTED |
 | 3 | Safe CSV and file export | stage/03-csv-export | NOT STARTED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
@@ -37,16 +37,16 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 
 ## Stage 1: Project and test foundation
 
-- Status: NOT STARTED
+- Status: IN PROGRESS
 - Branch: stage/01-project-foundation
 - Prerequisites: planning committed and pushed
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
+- Owner/task ID: 01a0a978-cc9f-7b53-84ef-c501ed284c0c (dispatch client-new-thread:77882112-bf8e-46df-848c-e8651025af64)
+- Base SHA: 8b3488f1dbe8ce71492a9bdc7498de62bfacc1c2; planning implementation and receipt ancestry verified; remote tip verified 2026-09-16.
+- Started (UTC): 2026-09-16T09:09:09.0935733Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
+- Summary: Ownership claimed after reconciling remote planning dispatch; no competing Stage 1 branch/task found.
 - Functionality implemented: None.
 - Tests added: None.
 - Targeted test result: NOT RUN.
@@ -226,3 +226,4 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 - Regression test: —
 - Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
 - Next stage: None; report final completion
+
