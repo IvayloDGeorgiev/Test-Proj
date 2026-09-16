@@ -33,6 +33,11 @@ builder.Services.AddControllers(options => options.Filters.Add<IngestionResultFi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 app.UseMiddleware<IngestionErrorMiddleware>();
 app.UseMiddleware<SyncOriginMiddleware>();
 app.UseMiddleware<IngestionLimitsMiddleware>();
