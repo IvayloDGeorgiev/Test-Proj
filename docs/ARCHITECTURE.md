@@ -1,0 +1,68 @@
+# Architecture
+
+## Inspected baseline
+
+Repository root contains Test Proj.slnx, .gitignore and the Test Proj directory. The application project is Test Proj/Test Proj.csproj, target net10.0, RootNamespace Test_Proj, nullable and implicit usings enabled, Microsoft.AspNetCore.OpenApi 10.0.12. Preserve these names and version unless a justified later dependency change is required. Working product name does not mandate a rename.
+
+Program.cs registers controllers/OpenAPI, redirects HTTPS, uses authorization middleware and maps controllers. OpenAPI is Development-only. The local JSON provider is currently added after builder.Build(); Stage 1 moves configuration setup before registration/build and explicitly preserves environment/CLI precedence. appsettings.json contains an unused GitHub configuration placeholder: it is not a Police API dependency; remove only that unused placeholder in Stage 1 without reading local credentials. WeatherForecast model/controller and the .http example are template code; remove/update when the first real route arrives in Stage 4. Local settings are already ignored and untracked.
+
+Baseline inspection: clean main at 55f0bb2; SDK 10.0.401; application build --no-restore passed, zero warnings/errors. No tests or ingestion code.
+
+## Proposed layout
+
+Retain one application. Add one necessary test project at tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj (net10.0, xUnit) to the EXISTING solution in Stage 1. Keeping tests outside the application avoids default SDK compile globs. No domain/infrastructure projects or generic repository layer.
+
+Under Test Proj/, namespaces remain Test_Proj plus folder names:
+
+| Directory | Responsibility |
+| --- | --- |
+| Controllers | HTTP binding, service call, documented responses |
+| Contracts/Requests and Responses | Validated requests and safe result metadata |
+| Clients/PoliceApi and Contracts | Typed client, upstream DTOs, transient transport policy |
+| Services | Dataset ingestion and explicit DTO-to-row mapping |
+| Export | CSV encoding, safe filenames, atomic file writer and operation lease |
+| Options | PoliceApiOptions, ExportOptions and startup validation |
+| Validation | Reusable coordinate/month rules |
+| Errors | Typed failure categories and centralized ProblemDetails translation |
+
+Avoid abstractions that only mirror a concrete class. Interfaces at replaceable HTTP/export/service boundaries support genuine unit isolation. Application services validate defensively before obtaining the operation lease, fetching, mapping and exporting. Dispose leases in finally. Controllers pass RequestAborted through every async boundary.
+
+```mermaid
+flowchart LR
+    Caller --> Controller
+    Controller --> Validation
+    Controller --> IngestionService
+    IngestionService --> TypedPoliceClient
+    TypedPoliceClient --> PoliceAPI
+    IngestionService --> CsvExporter
+    CsvExporter --> AtomicFileWriter
+    AtomicFileWriter --> TrustedRoot
+    Options --> TypedPoliceClient
+    Options --> AtomicFileWriter
+```
+
+## Contracts and mapping
+
+Use explicit System.Text.Json property names for upstream snake_case. Upstream DTOs remain separate from exported rows. Ignore unknown properties for forward compatibility; reject missing required identifiers/invalid required shapes instead of silently skipping records. Optional upstream location/outcome/demographics may be null. Dataset stages confirm official examples, freeze fixtures, and document deliberate schema adjustments.
+
+Initial CSV schema/order:
+
+- Forces: id,name. Both required nonblank strings.
+- Crimes: id,persistent_id,category,month,latitude,longitude,street_id,street_name,location_type,context,outcome_category,outcome_date. id/category/month required; location and outcome optional; requested month is validated against returned month when present.
+- StopSearches: type,datetime,age_range,gender,self_defined_ethnicity,officer_defined_ethnicity,legislation,object_of_search,outcome,involved_person,operation,operation_name,latitude,longitude,street_id,street_name. type/datetime required; optional fields empty, nullable booleans lowercase true/false or empty. No fabricated identifier.
+
+Use invariant culture; preserve upstream timestamp offsets as ISO 8601; never guess local timezone. Nested location/street/outcome objects flatten explicitly. Export no raw JSON blobs.
+
+## Transport and configuration
+
+PoliceApiOptions: BaseUrl (default https://data.police.uk/api/), attempt timeout, total operation timeout, maximum attempts, body/record limits. Enforce exact production HTTPS origin data.police.uk, default port, no userinfo, query or fragment; relative paths are code-owned. Test substitution uses a fake handler, not an arbitrary network destination. Disable redirects. Retry and error mapping follow R8-R11, with one retry owner and injected TimeProvider/delay/random seam for deterministic tests.
+
+ExportOptions: OutputRoot and conservative resource bounds in R7. The trusted configured root is normalized once; Development may resolve Environment.SpecialFolder.DesktopDirectory plus PoliceDataIngestion. Outside Development require explicit root. Startup rejects unsupported/unavailable configuration. Use a bounded single global lease (singleton) with immediate contention failure. File safety follows R15-R17; shared roots across multiple processes are unsupported.
+
+Register options with startup validation, typed client via AddHttpClient, application services via DI, singleton lease and clock. Avoid introducing resilience packages by default; a small bounded client policy is sufficient if thoroughly tested.
+
+## Errors, logging and hosting
+
+Central exception handling maps known errors to ProblemDetails with stable codes/statuses. Validation errors use ValidationProblemDetails. Production and Development ingestion error bodies must both be sanitized. Internal logs use approved safe fields, not exception strings containing local paths or payloads. No silent exception swallowing; cleanup failures are recorded safely without replacing the primary failure.
+
+A successful HTTP response represents an already-published CSV, not a queued job. No transaction across datasets. No automatic /run endpoint. OpenAPI describes all three POSTs, validation, success and error schemas. Unit tests cover individual components; WebApplicationFactory integration tests use the same test project and a partial Program entry point when needed in Stage 8. They substitute all upstream calls and write only to temporary roots.
