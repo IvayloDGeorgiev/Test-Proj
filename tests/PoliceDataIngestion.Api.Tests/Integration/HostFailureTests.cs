@@ -141,7 +141,9 @@ public sealed class HostFailureTests
         var document = JsonDocument.Parse(body).RootElement;
         Assert.StartsWith("3.", document.GetProperty("openapi").GetString());
         var paths = document.GetProperty("paths");
-        Assert.Equal(Routes.Select(r => "/api/ingestion/" + r).Order(), paths.EnumerateObject().Select(p => p.Name).Order());
+        Assert.Equal(Routes.Select(r => "/api/ingestion/" + r)
+            .Concat(Routes.Select(r => "/api/sync/" + r)).Append("/api/data/{dataset}").Order(),
+            paths.EnumerateObject().Select(p => p.Name).Order());
         foreach (var route in Routes)
         {
             var operation = paths.GetProperty("/api/ingestion/" + route).GetProperty("post");

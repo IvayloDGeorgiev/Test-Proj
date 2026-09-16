@@ -34,6 +34,12 @@ public sealed class IngestionResultFilter(TimeProvider clock, ILogger<IngestionR
     {
         var started = clock.GetTimestamp();
         var executed = await next();
+        if (executed.Exception is null && executed.Result is ObjectResult { Value: Test_Proj.Services.Sync.SyncResult sync })
+        {
+            if (OperationDeadline.Current is { } committed) context.HttpContext.RequestAborted = committed.Caller;
+            logger.LogInformation("Sync {Dataset} trace {TraceId} inserted {Inserted} updated {Updated} result committed",
+                sync.Dataset, context.HttpContext.TraceIdentifier, sync.Inserted, sync.Updated);
+        }
         if (executed.Exception is null && executed.Result is ObjectResult { Value: IngestionResult result })
         {
             // The service has published. Only caller cancellation governs response serialization now.

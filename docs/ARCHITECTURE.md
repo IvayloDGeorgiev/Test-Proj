@@ -1,5 +1,21 @@
 # Architecture
 
+## Stage 9 persistence and frontend
+
+The original controller application now also serves `wwwroot/index.html`, CSS and module JavaScript through default/static-file middleware. It calls only same-origin `/api/data/{dataset}` GET and the three `/api/sync/*` POST routes. Thin controllers delegate to scoped PoliceSyncService. RecordMapping validates existing DTO contracts and creates canonical projections; PoliceDbContext owns EF mappings and two generated migrations. No second application, repository abstraction, background job or combined sync operation is introduced.
+
+PoliceRecords has a composite dataset/scope/key primary key, optional unique dataset/scope/source-ID index, canonical validated DTO text, and UTC first-seen/update/last-seen columns with ordering constraints. Forces use one global scope and force IDs. Crimes use a month scope and persistent ID, falling back to numeric ID; numeric identity matching promotes later persistent IDs without duplication. Both retain rows absent from later responses. Reads accumulate crime locations by month. Only matching source keys/IDs are loaded for updates, keeping memory tied to the bounded incoming data instead of total historical storage.
+
+Stop/search has no event identifier in the official contract. It uses one snapshot per normalized point/month query, with SHA-256 known-field content keys and occurrence numbers. Reordering is stable and indistinguishable events retain multiplicity. A correction is removed/inserted, never an inferred event update. Each transaction reconciles this snapshot only, including clearing it for an empty response. Overlapping query snapshots are intentionally independent and cannot be treated as globally unique events. Existing snapshot reads are capped at 100001 rows to reject unexpected oversized data.
+
+The shared OperationLease covers upstream retrieval through commit and rejects sync/CSV contention without a queue. A PostgreSQL transaction-scoped try-advisory lock additionally rejects competing database writers across processes. Async EF reads/writes and transaction commit receive the request token. Validation of the complete bounded upstream list precedes database mutation; errors roll back. SaveChanges/commit have no automatic retry. Commit is the success boundary; the existing result filter restores the caller token for sync response serialization. Connection loss during commit may have an uncertain outcome; a later read/repeat reconciles safely.
+
+GetConnectionString("DefaultConnection") uses normal host configuration. Validation is lazy so absent database settings do not break CSV-only operation. The design-time factory reads environment only and offers `--schema-only` for offline model commands; it never builds the web host or loads local secrets. EF/Npgsql versions are pinned and relational dependencies explicitly aligned at 10.0.12. Database setup is an explicit EF migration command; normal startup never creates tables or changes schema.
+
+GET pages default to 50 with a 200-row maximum and bounded offset. Database failures return safe 503, command timeouts 504, request/deadline failures use existing middleware. Error handling discards raw database exceptions. EF logging is disabled and sensitive/error-detail/parameter logging explicitly disabled. Existing request byte and operation budgets also wrap database routes. Responses expose DTO projections and timestamps, never connection details or raw SQL.
+
+The frontend uses textContent and DOM construction for stored content, a busy guard plus disabled controls, polite status/result announcements, empty/error states and post-sync refresh. CSP restricts scripts/styles/connect to self, disables framing/objects/base URLs, and nosniff is set. Sync requires a custom header and rejects mismatched Origin values; no CORS access is enabled. Local trusted use remains the supported deployment boundary.
+
 ## Inspected baseline
 
 Repository root contains Test Proj.slnx, .gitignore and the Test Proj directory. The application project is Test Proj/Test Proj.csproj, target net10.0, RootNamespace Test_Proj, nullable and implicit usings enabled, Microsoft.AspNetCore.OpenApi 10.0.12. Preserve these names and version unless a justified later dependency change is required. Working product name does not mandate a rename.

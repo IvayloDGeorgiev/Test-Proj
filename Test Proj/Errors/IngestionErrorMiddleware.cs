@@ -70,6 +70,10 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
 
     private static (int Status, string Code) Classify(Exception error) => error switch
     {
+        SyncOriginException => (403, "sync_origin_rejected"),
+        Test_Proj.Persistence.DatabaseConfigurationException => (503, "database_not_configured"),
+        Test_Proj.Persistence.DatabaseOperationException => (503, "database_unavailable"),
+        Test_Proj.Persistence.DatabaseTimeoutException => (504, "database_timeout"),
         RequestBodyLimitException => (413, "request_body_too_large"),
         BadHttpRequestException { StatusCode: 413 } => (413, "request_body_too_large"),
         BadHttpRequestException => (400, "validation_failed"),

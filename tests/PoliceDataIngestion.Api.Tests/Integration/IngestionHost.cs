@@ -39,6 +39,7 @@ internal sealed class IngestionHost : WebApplicationFactory<Program>
         ["Logging:LogLevel:Microsoft.AspNetCore"] = "Warning"
     };
     public string EnvironmentName { get; set; } = "Production";
+    public string? WebRoot { get; set; }
 
     public IngestionHost(Func<int, HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>>? send = null)
     {
@@ -51,6 +52,7 @@ internal sealed class IngestionHost : WebApplicationFactory<Program>
     {
         // Set before the entry point loads Development-only optional configuration.
         builder.UseContentRoot(ContentRoot).UseEnvironment(EnvironmentName);
+        if (WebRoot is not null) builder.UseWebRoot(WebRoot);
         builder.ConfigureAppConfiguration((_, configuration) =>
         {
             configuration.Sources.Clear();
