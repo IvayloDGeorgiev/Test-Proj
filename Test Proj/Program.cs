@@ -3,6 +3,7 @@ using Test_Proj.Clients.PoliceApi;
 using Test_Proj.Export;
 using Test_Proj.Services.Forces;
 using Test_Proj.Errors;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddDevelopmentLocalConfiguration(builder.Environment);
@@ -31,6 +32,11 @@ builder.Services.AddControllers(options => options.Filters.Add<IngestionResultFi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 app.UseMiddleware<IngestionErrorMiddleware>();
 app.UseMiddleware<IngestionLimitsMiddleware>();
 
