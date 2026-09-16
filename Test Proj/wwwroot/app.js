@@ -22,11 +22,16 @@ async function request(url, options) {
   return response.json();
 }
 function render(page) {
-  const head = get('table-head'), body = get('table-body');
-  if (!head || !body) {
-    status('The saved-data table is unavailable. Refresh the page and try again.', true);
-    return;
+  const records = get('records');
+  let head = get('table-head'), body = get('table-body');
+  if ((!head || !body) && records) {
+    const table = document.createElement('table');
+    head = head || document.createElement('thead');
+    body = body || document.createElement('tbody');
+    head.id = 'table-head'; body.id = 'table-body';
+    table.append(head, body); records.replaceChildren(table);
   }
+  if (!head || !body) { status('The saved-data table is unavailable. Refresh the page and try again.', true); return; }
   head.replaceChildren(); body.replaceChildren();
   const columns = ['key', ...new Set(page.items.flatMap(item => Object.keys(item.data)))];
   const header = document.createElement('tr'); columns.forEach(column => { const cell = document.createElement('th'); cell.textContent = column.replaceAll('_', ' '); header.append(cell); }); head.append(header);
