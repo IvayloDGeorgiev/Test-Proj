@@ -30,7 +30,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
 | 8 | Integration and final verification | stage/08-integration-verification | COMPLETED |
-| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | NOT STARTED |
+| 9 | PostgreSQL persistence, data sync and simple frontend | stage/09-postgres-sync-frontend | IN PROGRESS |
 
 ## Dispatch ledger
 
@@ -242,4 +242,15 @@ Dispatch key: Test-Proj:stage-09. State: CREATED (worktree setup queued). Target
 - Resolution: Made crime/stop request parameters nonnullable while retaining defensive nullable service contracts; added strict JsonNumberHandling metadata to RecordCount; asserted aborted response stream semantics and fixed test sink signaling. Retargeted OpenAPI and cancellation regressions passed.
 - Regression test: HostFailureTests.OpenApi_Development_GeneratedDocumentDescribesActualRoutesSchemasAndMediaTypes; HostCancellationTests.Cancellation_UpstreamPending_DistinguishesAttemptDeadlineAndCaller; Input_PendingRead_ConsumesOperationBudgetAndPropagatesCallerCancellation.
 - Notes / decisions: Audited R1-R20 against REQUIREMENTS/ARCHITECTURE/SECURITY; no live Police API, real Desktop or local settings. TestServer does not claim deployment TLS/reverse-proxy/OS ownership behavior. Documentation now includes setup, examples, OpenAPI access, test command and operator boundaries.
-- Next stage: 9: PostgreSQL persistence, data sync and simple frontend (requested; dispatch pending).
+- Next stage: 9: PostgreSQL persistence, data sync and simple frontend (claimed below).
+
+## Stage 9: PostgreSQL persistence, data sync and simple frontend
+
+- Status: IN PROGRESS
+- Branch: stage/09-postgres-sync-frontend
+- Owner/task ID: 01a0a9ee-bec8-7613-b17f-37c3c68f3c5d; dispatch key Test-Proj:stage-09.
+- Base SHA: 0261c212fa8b90a93b625029442ea8f295dc55b5.
+- Started: 2026-09-16. Existing isolated 471d worktree resumed; clean before claim. Previous dispatch attempts did not implement code. No competing active owner or saved automation found.
+- Prerequisites: remote Stage 8 receipt fb7059169ac43c4331300307a9f48b37c8be8a43 independently verified; implementation 152a766a5aadb570325cbe2cda6a59c937c88574 and receipt are ancestors of the stage branch. Fetched origin and reconciled dispatch ledger.
+- Verification: pending implementation; no completion claimed. PostgreSQL 16 binaries installed; isolated database verification will avoid operator credentials and private configuration.
+- Next stage: none; final requested stage.
