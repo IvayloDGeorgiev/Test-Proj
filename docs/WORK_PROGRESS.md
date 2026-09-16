@@ -26,7 +26,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
-| 5 | Crime ingestion endpoint | stage/05-crime-ingestion | IN PROGRESS |
+| 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
@@ -141,16 +141,16 @@ Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target
 
 ## Stage 5: Crime ingestion endpoint
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/05-crime-ingestion
 - Prerequisites: Stage 4 completed and remote receipt verified
 - Owner/task ID: 01a0a9b0-de18-7820-86c4-c47251389de9 (dispatch client-new-thread:b02bd110-786d-42bf-ba17-1b4f3006e9d9)
 - Base SHA: 4b49b854feebcecaa68c95151ac8d1813213fb6b; predecessor implementation and receipt ancestry and remote tip verified; dispatch reconciled.
 - Started (UTC): 2026-09-16T10:10:11.5664197Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Stage 5 implemented and reviewed; all verification passed. Implementation push and completion receipt pending. Claim 824ef27b6da1d0d81dc21bfccb8424561b6a5322 pushed and independently verified.
+- Completed (UTC): 2026-09-16T10:17:42.9134145Z
+- Commit SHA (implementation): 648e5f04933bfc98cc5db47a2f78e52ea83f0296
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/05-crime-ingestion returned exactly 648e5f04933bfc98cc5db47a2f78e52ea83f0296. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Stage 5 implemented and reviewed; all verification passed. Implementation push independently verified; this receipt records completion. Claim 824ef27b6da1d0d81dc21bfccb8424561b6a5322 pushed and independently verified.
 - Functionality implemented: POST /api/ingestion/crimes; nullable location/month request validation before side effects; typed all-crime GET with existing bounded transport; explicit nullable DTOs and eager row mapping; positive id, nonblank category and matching month required; finite bounded optional coordinates; shared singleton lease through publication; exact Crimes_YYYY-MM.csv schema, published count, header-only empty replacement; safe 400 ValidationProblemDetails and common sanitized errors.
 - Tests added: 64 genuine AAA Crimes tests using fake HTTP/client/export boundaries and real transport/mapping/service/controller/middleware, with real temporary-directory exports. Frozen official fixture; invariant URI/culture; exact UTF-8/CRLF schema and values; required fields/shapes/month, optional nested objects, unknown fields, formula/Unicode text; invalid request zero side effects; inclusive bounds; counts and replacement; null defensive boundaries; contention while retrieval/export pending; cancellation before/during/after retrieval and body reads, export and publication commit point; upstream statuses and size/row limits; publication failure preservation/cleanup; safe response and concrete validation errors.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Crimes --no-restore PASSED exit 0, 64 passed, 0 failed/skipped. Focused Crimes_NullRequest regression retest PASSED 1/1.
