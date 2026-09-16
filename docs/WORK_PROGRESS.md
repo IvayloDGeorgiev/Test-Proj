@@ -28,7 +28,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
-| 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
+| 7 | API limits and operational contracts | stage/07-api-hardening | IN PROGRESS |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
 ## Dispatch ledger
@@ -193,12 +193,12 @@ Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target
 
 ## Stage 7: API limits and operational contracts
 
-- Status: NOT STARTED
+- Status: IN PROGRESS
 - Branch: stage/07-api-hardening
 - Prerequisites: Stage 6 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
+- Owner/task ID: 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1 (dispatch client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371)
+- Base SHA: 39b5a5b2338836cd6502a42fdc62d55cf5b9d839; remote predecessor implementation/receipt ancestry verified; final dispatch reconciled; no competing owner or branch.
+- Started (UTC): 2026-09-16T10:29:56.0168317Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
