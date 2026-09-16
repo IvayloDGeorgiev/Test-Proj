@@ -15,7 +15,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 - Issue identified: local provider is added after builder.Build(). Stage 1 moves it earlier and tests precedence using synthetic values.
 - Decision: preserve physical app/solution names; add only necessary test project in Stage 1. Eight sequential stages with security alongside each feature. Separate POSTs; /run deferred.
 - Planning checks: PASSED nine required documents, local links, exact eight-stage names/order and requirement/architecture/test/security consistency review. Local secrets remain ignored and untracked; existing source diff is empty. Commit SHA and push evidence will be recorded only after actual success in a separate receipt.
-- Automatic task creation: available through this environment's task tools; Stage 1 dispatch prepared; no task created yet.
+- Automatic task creation: available through this environment's task tools; Stage 1 isolated task creation accepted; worktree setup queued. Client task ID: client-new-thread:77882112-bf8e-46df-848c-e8651025af64. Implementation belongs to that new task, not this planning task.
 - Planning next stage: Stage 1, only after planning push.
 
 ## Stage index
@@ -33,7 +33,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 
 ## Dispatch ledger
 
-Dispatch key: Test-Proj:stage-01. State: PENDING. Target: Stage 1 only, fresh worktree from docs/project-planning after this receipt is pushed. Planning implementation tip: 829da51b36b9ccaa62c996a60ffb20978b37f173. Task ID: not yet returned. Duplicate check: project task listing showed no Stage 1 task on 2026-09-16. Coordinator: planning task. Child must inspect the latest remote dispatch ledger before claiming work. No implementation stage owner yet.
+Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target: Stage 1 only, fresh worktree from docs/project-planning at verified receipt ec7cf082b5b5355cb9ef725984b4ea84708e30fd. Planning implementation tip: 829da51b36b9ccaa62c996a60ffb20978b37f173. Client task ID: client-new-thread:77882112-bf8e-46df-848c-e8651025af64. Created UTC: 2026-09-16T09:08:05.5659300Z. Do not pass this client ID to tools requiring a thread ID; resolve the task listing first. Duplicate check: project task listing showed no Stage 1 task on 2026-09-16. Coordinator: planning task. Child must inspect the latest remote dispatch ledger before claiming work. No implementation stage owner yet.
 
 ## Stage 1: Project and test foundation
 
