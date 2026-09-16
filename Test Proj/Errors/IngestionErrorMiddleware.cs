@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Test_Proj.Export;
+using Test_Proj.Validation;
 
 namespace Test_Proj.Errors;
 
@@ -26,18 +27,27 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
             }
             context.Response.Clear();
             context.Response.StatusCode = status;
-            var problem = new ProblemDetails
+            ProblemDetails problem = error is RequestValidationException validation
+                ? new ValidationProblemDetails(validation.Errors.ToDictionary(pair => pair.Key, pair => pair.Value))
+                : new ProblemDetails();
+            problem.Status = status;
+            problem.Title = status switch
             {
-                Status = status,
-                Title = status == 409 ? "An ingestion operation is already running." : "Ingestion failed.",
-                Type = "about:blank"
+                400 => "Request validation failed.",
+                409 => "An ingestion operation is already running.",
+                _ => "Ingestion failed."
             };
+            problem.Type = "about:blank";
             problem.Extensions["code"] = code;
             problem.Extensions["traceId"] = context.TraceIdentifier;
             try
             {
-                await context.Response.WriteAsJsonAsync(problem, options: null,
-                    contentType: "application/problem+json", cancellationToken: context.RequestAborted);
+                if (problem is ValidationProblemDetails invalid)
+                    await context.Response.WriteAsJsonAsync(invalid, options: null,
+                        contentType: "application/problem+json", cancellationToken: context.RequestAborted);
+                else
+                    await context.Response.WriteAsJsonAsync(problem, options: null,
+                        contentType: "application/problem+json", cancellationToken: context.RequestAborted);
             }
             catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested) { }
         }
@@ -45,6 +55,7 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
 
     private static (int Status, string Code) Classify(Exception error) => error switch
     {
+        RequestValidationException => (400, "validation_failed"),
         PoliceApiException upstream => (upstream.StatusCode, upstream.Code),
         ExportException { Code: "operation_busy", StatusCode: 409 } => (409, "operation_busy"),
         // ExportException accepts strings; never reflect arbitrary codes or statuses.
