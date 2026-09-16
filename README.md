@@ -1,6 +1,6 @@
 # PoliceDataIngestion.Api
 
-The existing .NET 10 controller application now has validated configuration, reusable Police API transport and request validation, safe CSV storage, and an xUnit suite. **Ingestion is not implemented yet.** WeatherForecast remains until Stage 4.
+The existing .NET 10 controller application now provides **POST /api/ingestion/forces**, with validated configuration, reusable Police API transport, safe CSV storage, and an xUnit suite. Crime and stop/search ingestion remain planned. The WeatherForecast template has been removed.
 
 The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. No database is planned. Later stages retrieve public UK Police data and export Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv.
 
@@ -23,13 +23,25 @@ Foundation tests use synthetic configuration, temporary directories and a synthe
 
 Stage 2 registers `IPoliceApiClient` through the typed HttpClient factory. `GetForcesAsync` returns validated id/name records, including an empty list for an empty array. All requests use the trusted HTTPS origin; redirects, cookies and automatic decompression are disabled. Response bytes are bounded while reading, before JSON parsing, and record counts are checked before DTO materialization. Malformed data and permanent statuses are never retried. Transient GET failures have at most three attempts, 500 ms exponential backoff plus up to 250 ms jitter (5-second cap), and Retry-After support that never retries early. An unfittable retry delay fails with a classified 503; exhausted timeouts classify as 504. Attempt and total retrieval deadlines include body reads and backoff. Stage 7 will extend the operation deadline across export I/O.
 
-`LocationMonth.Create` validates nullable finite coordinates and exact ASCII calendar months before query formatting; query numbers use invariant culture. These reusable values do not yet expose crime or stop/search calls. `PoliceApiException` contains safe codes/statuses only; HTTP ProblemDetails translation arrives with ingestion. Transport logs safe dataset/trace/attempt/status-class/count/elapsed/result fields and suppresses the factory's URL logging. Tests use scripted handlers and a manual clock, never live Police API calls or real retry sleeps.
+`LocationMonth.Create` validates nullable finite coordinates and exact ASCII calendar months before query formatting; query numbers use invariant culture. These reusable values do not yet expose crime or stop/search calls. `PoliceApiException` contains safe codes/statuses only; centralized middleware translates ingestion failures into sanitized ProblemDetails in both Development and Production. Transport logs safe dataset/trace/attempt/status-class/count/elapsed/result fields and suppresses the factory's URL logging. Tests use scripted handlers and a manual clock, never live Police API calls or real retry sleeps.
 
-Stage 3 registers `ICsvExporter` and a singleton `OperationLease`. Future ingestion services acquire a lease before retrieval, pass it to the exporter and dispose it in a `using`/`finally` scope. Admission rejects contention immediately with `operation_busy` (409); there is no queue. A lease permits only one write at a time. It remains occupied during an active write even if disposed early. Multiple processes sharing a root are unsupported.
+`ICsvExporter` and a singleton `OperationLease` support ingestion. The forces service acquires a lease before retrieval, passes it to the exporter and disposes it in a `using` scope. Admission rejects contention immediately with `operation_busy` (409); there is no queue. A lease permits only one write at a time. It remains occupied during an active write even if disposed early. Multiple processes sharing a root are unsupported.
 
 CSV uses BOM-free UTF-8, CRLF records and code-owned schemas/filenames. Text containing commas, quotes or line breaks is quoted, with embedded quotes doubled. Dangerous text receives a leading apostrophe before quoting: formula markers after whitespace/control characters, or values starting with tab/CR/LF. This deliberately changes unsafe text values. Typed finite numbers use invariant formatting; negative coordinates remain numeric. Optional nulls are empty cells, booleans lowercase, and timestamps retain their offsets.
 
 The exporter writes a unique same-directory temporary file, flushes and closes it, then uses an atomic move or replacement. Replacement and old-reader behavior are tested on local Windows NTFS. Repeating a dataset/month intentionally replaces its file, including header-only zero-row output; later different-coordinate requests for the same month use the same filename. Errors and cancellation before publication preserve the old file and attempt temporary cleanup. Publication is the commit point; cancellation after that point does not undo success. A changed unsafe root or cleanup I/O failure leaves a safe warning code and may require operator cleanup of the temporary file. No copy/delete publication fallback is used. Tests use isolated temporary directories, synthetic settings and injected I/O faults.
+
+## Forces endpoint
+
+With the HTTPS launch profile running, send a POST with no parameters or body to `https://localhost:7046/api/ingestion/forces` (also provided in `Test Proj/Test Proj.http`). HTTP 200 means `Forces.csv` has already been published with exact columns `id,name`. Both upstream values must be nonblank; any invalid record fails the operation before export. The [official forces contract](https://data.police.uk/docs/method/forces/) was rechecked on 2026-09-16; the endpoint excludes British Transport Police.
+
+Example response (completion time and count vary):
+
+```json
+{"success":true,"dataset":"forces","recordCount":1,"filename":"Forces.csv","completedAtUtc":"2026-09-16T10:00:00+00:00"}
+```
+
+The result exposes only the filename and records actually exported. Empty results publish a header-only file and return zero. Repeated requests replace Forces.csv. Errors return `application/problem+json` with stable `code` and `traceId`: contention 409; invalid upstream data or exhausted network/server failures 502; rate limiting or insufficient retry budget 503; retrieval timeout 504; local export/configuration or unexpected failure 500. Error responses and application error logs omit raw exception details, upstream bodies and paths. Caller cancellation propagates through retrieval/export and does not create a response to a disconnected caller. Cancellation after atomic publication cannot undo the committed file. The full operation deadline and remaining host resource limits are Stage 7 work; host integration tests remain Stage 8 work.
 
 ## Development documentation
 

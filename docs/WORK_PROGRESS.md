@@ -124,17 +124,17 @@ Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Claimed isolated Stage 4 work after remote prerequisite and duplicate checks.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Stage 4 implemented and reviewed; restore, targeted/full tests and build passed. Status remains IN PROGRESS until implementation push is verified. Claim 0761388f4e7afac0ca65ef06b52105e9bd794a54 pushed and independently verified.
+- Functionality implemented: POST /api/ingestion/forces; scoped service with eager required id/name validation and explicit text-cell mapping; shared lease acquired before retrieval and held through publication; common safe success metadata with exported count, code-owned filename and UTC completion time; centralized sanitized ProblemDetails with stable codes/trace IDs, safe logs and disconnected-caller handling. Empty/repeated export replacement uses the existing atomic exporter. Removed WeatherForecast model/controller and updated HTTPS .http example.
+- Tests added: 36 genuine AAA forces tests using fake client/export/service boundaries with real mapping/service/controller/middleware, plus real temporary-directory exports. Frozen official fixture, exact header/order/UTF-8/escaping/formula protection, counts/result shape, repeated/empty replacement, null/blank required records, no export after invalid data, retrieval/publication contention, token propagation, cancellation before/during/after retrieval and during export, publication commit point, write failure/preservation/cleanup/lease release, controller interaction/failure, all upstream failure categories and safe arbitrary exception/code handling, disconnected caller and response/log sanitization.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Forces --no-restore PASSED exit 0, 109 passed, 0 failed/skipped (36 new + 73 existing forces transport cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Forces PASSED exit 0, 36 passed.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 267 passed, 0 failed/skipped (231 predecessor + 36 Stage 4). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial patch tool rejected duplicate delete/add operations for the .http path before applying changes; used one update operation instead. No test/build failures or unresolved implementation defects. Review noted ExportException exposes arbitrary code/status constructor values, so HTTP translation must not echo them.
+- Root cause: Patch operation format restriction; open exception string/status boundary could disclose data if reflected directly.
+- Resolution: Applied the .http edit as an update. Error middleware allowlists contention and maps all other export exceptions to safe export_failed/500; never logs exception objects or messages.
+- Regression test: Errors_ClassifiedFailure_ReturnsSafeProblemAndSafeLog includes a synthetic sensitive path in an ExportException with status 200 and verifies safe 500, no secret/path disclosure in JSON/logs, and no logged exception object.
+- Notes / decisions: Reviewed Stage 4 R2-R4/R11 and R19/R20 with architecture/security; preserved net10.0 solution/namespace and existing transport/export contracts. Official forces documentation rechecked 2026-09-16 at https://data.police.uk/docs/method/forces/: id/name, British Transport Police excluded. Example frozen in tests. No packages added. HTTP middleware handles both environments and avoids raw diagnostic exception logging; arbitrary cancellation without caller cancellation is an internal failure. Full-operation timeout/input limits and completed operational logs remain Stage 7, host integration Stage 8. README/architecture updated. Tests never contact live Police API, use real Desktop or read local settings. Ignored local configuration remains untracked and was not read/copied. Safe explicit diff/status/secret review completed; no generated exports staged.
 - Next stage: 5: Crime ingestion endpoint
 
 ## Stage 5: Crime ingestion endpoint
