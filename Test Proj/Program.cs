@@ -47,3 +47,6 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+// Expose the existing entry point to the isolated integration test host.
+public partial class Program { }

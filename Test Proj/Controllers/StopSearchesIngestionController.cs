@@ -19,6 +19,6 @@ public sealed class StopSearchesIngestionController(IStopSearchesIngestionServic
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status502BadGateway, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status504GatewayTimeout, "application/problem+json")]
-    public async Task<ActionResult<IngestionResult>> StopSearches([FromBody] LocationMonthRequest? request) =>
+    public async Task<ActionResult<IngestionResult>> StopSearches([FromBody] LocationMonthRequest request) =>
         Ok(await stopSearches.IngestAsync(request, HttpContext.RequestAborted));
 }
