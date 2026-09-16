@@ -23,7 +23,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | Stage | Name | Branch | Status |
 | --- | --- | --- | --- |
 | 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
-| 2 | Police API transport and validation | stage/02-police-api-client | IN PROGRESS |
+| 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | NOT STARTED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
@@ -63,16 +63,16 @@ Dispatch key: Test-Proj:stage-02. State: CREATED (worktree setup queued). Target
 
 ## Stage 2: Police API transport and validation
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/02-police-api-client
 - Prerequisites: Stage 1 completed and remote receipt verified
 - Owner/task ID: 01a0a98c-d3a2-7141-bd2a-4c419d020287 (dispatch client-new-thread:8b492d04-0bb3-499d-9f01-dacae6b5f238)
 - Base SHA: 4de254dab154d4b896f69703eb086cf5235148d3; predecessor implementation 5bcc1fb6936f7461b426d6575c9842f5e187c97c and receipt a0b9cad1e53a6fb4bde9cf69a483af9364714ebf ancestry verified. Remote predecessor dispatch-only update reconciled before claim.
 - Started (UTC): 2026-09-16T09:31:02.1157548Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: Ownership claim ce758f6c7b01c8482c4be131c89a7935c41d6fb9 pushed and remote tip independently matched with git ls-remote. Implementation push pending.
-- Summary: Scoped implementation and verification complete; remains IN PROGRESS until implementation push and receipt gate.
+- Completed (UTC): 2026-09-16T09:42:44.9797528Z
+- Commit SHA (implementation): 2f332dcfaafbc201097735abf6d8a8cfa068bcd5
+- Push evidence / receipt: Ownership claim ce758f6c7b01c8482c4be131c89a7935c41d6fb9 pushed and remote tip independently matched with git ls-remote. Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/02-police-api-client returned exactly 2f332dcfaafbc201097735abf6d8a8cfa068bcd5. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Scoped implementation, review, targeted/full tests and build passed; implementation push independently verified. This receipt records the completion gate.
 - Functionality implemented: Typed forces client, DTO/required-field validation, bounded reusable JSON array reader, immutable coordinate/month validation and invariant query formatting, exact origin snapshot, redirects/cookies/decompression disabled, safe structured logging without URL loggers, classified safe failures, bounded transient GET retries, injectable monotonic clock/timers/jitter, Retry-After minimums and caller cancellation. No ingestion endpoints, crime/stop DTOs or CSV exporter added.
 - Tests added: 109 genuine AAA cases using scripted HttpMessageHandler and manual TimeProvider; valid/invalid arrays, fields and shapes, unknown fields, URI/method/token, response disposal, byte/record boundaries (known/unknown/misreported content length), partial body I/O failure, all retryable/permanent statuses, network classifications, Retry-After delta/date/past/malformed/zero/beyond budget, exhausted attempts, attempt/total timeouts, cancellation before/during send/body/backoff, safe logs/errors, actual DI handler settings, options snapshots, coordinates and ASCII calendar months with non-English culture.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~PoliceApi --no-restore PASSED exit 0, 109 passed, 0 failed/skipped. Validation-only regression retest passed 30 cases; earlier expanded transport run passed 102.
