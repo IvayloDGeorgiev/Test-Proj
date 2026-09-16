@@ -22,7 +22,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 
 | Stage | Name | Branch | Status |
 | --- | --- | --- | --- |
-| 1 | Project and test foundation | stage/01-project-foundation | IN PROGRESS |
+| 1 | Project and test foundation | stage/01-project-foundation | COMPLETED |
 | 2 | Police API transport and validation | stage/02-police-api-client | NOT STARTED |
 | 3 | Safe CSV and file export | stage/03-csv-export | NOT STARTED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | NOT STARTED |
@@ -37,16 +37,16 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 
 ## Stage 1: Project and test foundation
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/01-project-foundation
 - Prerequisites: planning committed and pushed
 - Owner/task ID: 01a0a978-cc9f-7b53-84ef-c501ed284c0c (dispatch client-new-thread:77882112-bf8e-46df-848c-e8651025af64)
 - Base SHA: 8b3488f1dbe8ce71492a9bdc7498de62bfacc1c2; planning implementation and receipt ancestry verified; remote tip verified 2026-09-16.
 - Started (UTC): 2026-09-16T09:09:09.0935733Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Foundation implemented and verified; awaiting implementation push and documentation receipt. Ownership claim 25c54b9e50f051c096ad1845f5d8fe6564255f6b was pushed and remote verified.
+- Completed (UTC): 2026-09-16T09:23:11.6176066Z
+- Commit SHA (implementation): 5bcc1fb6936f7461b426d6575c9842f5e187c97c
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/01-project-foundation returned exactly 5bcc1fb6936f7461b426d6575c9842f5e187c97c. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Foundation implemented, tested, built and implementation push verified; this receipt records the completion gate. Ownership claim 25c54b9e50f051c096ad1845f5d8fe6564255f6b was pushed and remote verified.
 - Functionality implemented: Development-only local provider before registration/build with preserved higher-priority overrides; build/publish local JSON exclusion; removed unused GitHub placeholder; validated PoliceApi/Export options at startup; one xUnit project in existing net10.0 solution; generated exports ignored. WeatherForecast retained; no ingestion implemented.
 - Tests added: 56 genuine AAA foundation cases for provider timing, environment/CLI priority, optional file absence, origins, limits, root safety, Desktop fallback, startup failure/success and a real synthetic build/publish exclusion probe with positive output controls. No live Police API, real local configuration or real Desktop access.
 - Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Foundation --no-restore PASSED exit 0, 56 passed, 0 failed/skipped (initial suite 48 passed; review added 8 cases).
