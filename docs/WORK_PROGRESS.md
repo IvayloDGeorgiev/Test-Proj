@@ -46,17 +46,17 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Ownership claimed after reconciling remote planning dispatch; no competing Stage 1 branch/task found.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Foundation implemented and verified; awaiting implementation push and documentation receipt. Ownership claim 25c54b9e50f051c096ad1845f5d8fe6564255f6b was pushed and remote verified.
+- Functionality implemented: Development-only local provider before registration/build with preserved higher-priority overrides; build/publish local JSON exclusion; removed unused GitHub placeholder; validated PoliceApi/Export options at startup; one xUnit project in existing net10.0 solution; generated exports ignored. WeatherForecast retained; no ingestion implemented.
+- Tests added: 56 genuine AAA foundation cases for provider timing, environment/CLI priority, optional file absence, origins, limits, root safety, Desktop fallback, startup failure/success and a real synthetic build/publish exclusion probe with positive output controls. No live Police API, real local configuration or real Desktop access.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Foundation --no-restore PASSED exit 0, 56 passed, 0 failed/skipped (initial suite 48 passed; review added 8 cases).
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 56 passed, 0 failed/skipped. Restore of both solution projects PASSED exit 0; no dependency audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors. Synthetic publish test also verifies compiled DLL/default settings exist while local settings are absent from both build and publish output.
+- Issues encountered / investigation: Baseline local provider was registered after Build and after higher-priority providers. Initial Git fetch failed due to sandbox Git metadata/network restrictions; approved elevated retry succeeded. dotnet template help encountered a sandbox cache permission error; no template was needed, test project was authored explicitly. Claim commit had a trailing blank-line diff warning; removed before implementation commit. No test/build failures occurred.
+- Root cause: Configuration setup order permitted late reads and local overrides of environment/CLI. Repository root and shared Git metadata sit outside the app-only sandbox write root.
+- Resolution: Insert provider after standard JSON before registration; retain higher-priority providers. Use approved elevated operations for repository-root files, Git and test outputs. Removed trailing blank line and verified diff whitespace checks.
+- Regression test: Configuration_SyntheticLocalFile_RespectsEnvironmentAndRegistrationTiming and Configuration_LocalFile_PreservesEnvironmentAndCommandLinePriority assert captured service values and actual provider results. Publish_SyntheticLocalSettings_ExcludesLocalFileFromBuildAndPublish verifies actual MSBuild behavior.
+- Notes / decisions: R1/R18 foundation and stage-specific R19/R20 reviewed against requirements, architecture and security. Limit defaults are conservative upper bounds; concurrency fixed at one/no queue. Local JSON reload disabled; restart for options changes. Windows fixed local drives are supported; explicit nonexistent directories allowed, with ownership/permissions and write-time safety deferred to the planned Stage 3 exporter. Transport and host enforcement remain in their assigned stages. README documents these boundaries. Secret file contents were never accessed/copied; local file remains ignored/untracked. Intended diff and dependency additions reviewed.
 - Next stage: 2: Police API transport and validation
 
 ## Stage 2: Police API transport and validation
@@ -226,4 +226,3 @@ Dispatch key: Test-Proj:stage-01. State: CREATED (worktree setup queued). Target
 - Regression test: —
 - Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
 - Next stage: None; report final completion
-

@@ -1,21 +1,25 @@
 # PoliceDataIngestion.Api
 
-Planning and workflow setup for an existing ASP.NET Core Web API. **Ingestion is not implemented yet.** The repository still contains the WeatherForecast template.
+The existing .NET 10 controller application now has validated configuration and an xUnit foundation. **Ingestion is not implemented yet.** WeatherForecast remains until Stage 4.
 
-The working product name is PoliceDataIngestion.Api; the existing project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. It targets .NET 10 with controllers, nullable C#, and OpenAPI.
+The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. No database is planned. Later stages retrieve public UK Police data and export Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv.
 
-The planned application retrieves public [UK Police data](https://data.police.uk/docs/), validates/maps it, and exports Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv. Thin POST controllers call ingestion services, a typed HTTP client and a safe CSV exporter. No database is planned.
-
-Local development will use a configurable export root, optionally resolved from the current user's Desktop. Callers cannot supply paths or upstream URLs. appsettings.Local.json is ignored and must never be committed or disclosed. Git authentication is tooling configuration.
-
-From the repository root, the existing baseline can be built with:
+From the repository root:
 
 ```powershell
-dotnet build "Test Proj.slnx"
+dotnet restore "Test Proj.slnx"
+dotnet test "Test Proj.slnx" --no-restore
+dotnet build "Test Proj.slnx" --no-restore
 dotnet run --project "Test Proj/Test Proj.csproj" --launch-profile https
 ```
 
-These commands currently run the template, not ingestion. Stage 1 adds xUnit tests; later tests use isolated HTTP handlers and temporary directories, with no live API dependency.
+Development resolves the current user's existing Desktop directory programmatically and selects its PoliceDataIngestion child as the output root. If Desktop is unavailable, configure `Export:OutputRoot` explicitly. Production always requires an explicit root. It must be an absolute local directory on a fixed Windows drive, without traversal, device names or links. The directory may be created later by the exporter; Stage 1 does not write exports or probe write permissions. The operator must own the directory and prevent untrusted writes. Stage 3 must recheck filesystem safety at write time.
+
+An optional `appsettings.Local.json` loads only in Development, before service registration and startup validation. It overrides standard JSON; user secrets, environment variables (for example `Export__OutputRoot`) and command-line arguments retain higher priority. Local configuration is ignored, untracked and excluded from build/publish output. Do not copy it into worktrees. Git authentication belongs to development tooling, not the application.
+
+Options use sections `PoliceApi` and `Export`. PoliceApi defaults/maxima are: BaseUrl `https://data.police.uk/api/`, AttemptTimeoutSeconds 30, TotalOperationTimeoutSeconds 120, MaximumAttempts 3, MaximumResponseBytes 33554432 and MaximumRecords 100000. Positive limits may be reduced; attempt timeout cannot exceed total timeout. Export defaults/maxima are MaximumRequestBodyBytes 4096, MaximumConcurrentOperations exactly 1 and MaximumQueuedOperations exactly 0. OutputRoot has no production default. Options are validated at startup, but transport, admission, request limits and export enforcement arrive in their planned stages. Restart after configuration changes; local JSON reload is disabled to avoid changing trusted paths mid-operation.
+
+Foundation tests use synthetic configuration, temporary directories and a synthetic publish probe. They do not read local credentials, use the real Desktop or contact the Police API.
 
 ## Development documentation
 

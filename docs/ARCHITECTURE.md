@@ -4,9 +4,9 @@
 
 Repository root contains Test Proj.slnx, .gitignore and the Test Proj directory. The application project is Test Proj/Test Proj.csproj, target net10.0, RootNamespace Test_Proj, nullable and implicit usings enabled, Microsoft.AspNetCore.OpenApi 10.0.12. Preserve these names and version unless a justified later dependency change is required. Working product name does not mandate a rename.
 
-Program.cs registers controllers/OpenAPI, redirects HTTPS, uses authorization middleware and maps controllers. OpenAPI is Development-only. The local JSON provider is currently added after builder.Build(); Stage 1 moves configuration setup before registration/build and explicitly preserves environment/CLI precedence. appsettings.json contains an unused GitHub configuration placeholder: it is not a Police API dependency; remove only that unused placeholder in Stage 1 without reading local credentials. WeatherForecast model/controller and the .http example are template code; remove/update when the first real route arrives in Stage 4. Local settings are already ignored and untracked.
+Program.cs registers controllers/OpenAPI, redirects HTTPS, uses authorization middleware and maps controllers. OpenAPI is Development-only. Stage 1 inserts Development-only local JSON after standard JSON and before higher-priority providers, before registration/build. Local JSON reload is disabled; options changes require restart. The unused GitHub placeholder has been removed, and local JSON is excluded from build/publish output. WeatherForecast model/controller and the .http example are template code; remove/update when the first real route arrives in Stage 4. Local settings are already ignored and untracked.
 
-Baseline inspection: clean main at 55f0bb2; SDK 10.0.401; application build --no-restore passed, zero warnings/errors. No tests or ingestion code.
+Baseline inspection: clean main at 55f0bb2; SDK 10.0.401; application build --no-restore passed, zero warnings/errors. No tests or ingestion code at baseline; Stage 1 adds the foundation suite.
 
 ## Proposed layout
 
@@ -57,7 +57,7 @@ Use invariant culture; preserve upstream timestamp offsets as ISO 8601; never gu
 
 PoliceApiOptions: BaseUrl (default https://data.police.uk/api/), attempt timeout, total operation timeout, maximum attempts, body/record limits. Enforce exact production HTTPS origin data.police.uk, default port, no userinfo, query or fragment; relative paths are code-owned. Test substitution uses a fake handler, not an arbitrary network destination. Disable redirects. Retry and error mapping follow R8-R11, with one retry owner and injected TimeProvider/delay/random seam for deterministic tests.
 
-ExportOptions: OutputRoot and conservative resource bounds in R7. The trusted configured root is normalized once; Development may resolve Environment.SpecialFolder.DesktopDirectory plus PoliceDataIngestion. Outside Development require explicit root. Startup rejects unsupported/unavailable configuration. Use a bounded single global lease (singleton) with immediate contention failure. File safety follows R15-R17; shared roots across multiple processes are unsupported.
+ExportOptions: OutputRoot and conservative resource bounds in R7. The trusted configured root is normalized once; Development may resolve Environment.SpecialFolder.DesktopDirectory plus PoliceDataIngestion. Outside Development require explicit root. Startup rejects unsupported configuration, unavailable Desktop fallback, filesystem roots, traversal, Windows device names, non-fixed Windows drives and existing link/file components. Explicit directories may not yet exist; permissions and filesystem race checks are the Stage 3 writer responsibility and must also be checked at write time. Use a bounded single global lease (singleton) with immediate contention failure. File safety follows R15-R17; shared roots across multiple processes are unsupported.
 
 Register options with startup validation, typed client via AddHttpClient, application services via DI, singleton lease and clock. Avoid introducing resilience packages by default; a small bounded client policy is sufficient if thoroughly tested.
 
