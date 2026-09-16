@@ -27,7 +27,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
-| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
+| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | IN PROGRESS |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
@@ -167,16 +167,16 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 
 ## Stage 6: Stop-and-search ingestion endpoint
 
-- Status: NOT STARTED
+- Status: IN PROGRESS
 - Branch: stage/06-stop-search-ingestion
 - Prerequisites: Stage 5 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
+- Owner/task ID: 01a0a9b9-f769-7d50-8769-d6d65bfa083e (dispatch client-new-thread:0683b7e8-42fa-4535-86cc-95c66b23707f)
+- Base SHA: bdc4ec3bfeda54a96af6088af8756ced968b769b; predecessor implementation/receipt ancestry and remote tip verified; final dispatch update reconciled; no competing branch/task found.
+- Started (UTC): 2026-09-16T10:20:20.9086464Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
+- Summary: Ownership claimed; implementing Stage 6 only.
 - Functionality implemented: None.
 - Tests added: None.
 - Targeted test result: NOT RUN.
