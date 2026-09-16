@@ -9,16 +9,27 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
 {
     public async Task InvokeAsync(HttpContext context)
     {
+        var started = System.Diagnostics.Stopwatch.GetTimestamp();
         try { await next(context); }
         catch (OperationCanceledException) when (context.RequestAborted.IsCancellationRequested)
         {
             // The caller has gone away; do not create an error response.
+            logger.LogInformation("Ingestion trace {TraceId} elapsed ms {ElapsedMs} result {Result}",
+                context.TraceIdentifier, System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds, "caller_cancelled");
         }
         catch (Exception error)
         {
             var (status, code) = Classify(error);
-            logger.LogWarning("Ingestion failed. TraceId: {TraceId} Code: {Code} Status: {Status}",
-                context.TraceIdentifier, code, status);
+            var dataset = context.Request.Path.Value?.TrimEnd('/').ToLowerInvariant() switch
+            {
+                "/api/ingestion/forces" => "forces",
+                "/api/ingestion/crimes" => "crimes",
+                "/api/ingestion/stop-searches" => "stop-searches",
+                _ => "unknown"
+            };
+            logger.LogWarning("Ingestion {Dataset} trace {TraceId} result {Code} status {Status} status class {StatusClass} elapsed ms {ElapsedMs}",
+                dataset, context.TraceIdentifier, code, status, status / 100,
+                System.Diagnostics.Stopwatch.GetElapsedTime(started).TotalMilliseconds);
             if (context.RequestAborted.IsCancellationRequested) return;
             if (context.Response.HasStarted)
             {
@@ -27,9 +38,13 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
             }
             context.Response.Clear();
             context.Response.StatusCode = status;
-            ProblemDetails problem = error is RequestValidationException validation
-                ? new ValidationProblemDetails(validation.Errors.ToDictionary(pair => pair.Key, pair => pair.Value))
-                : new ProblemDetails();
+            ProblemDetails problem = error switch
+            {
+                RequestValidationException validation => SafeValidation(validation),
+                BadHttpRequestException when status == 400 => new ValidationProblemDetails(
+                    new Dictionary<string, string[]> { ["request"] = ["Supply a valid request."] }),
+                _ => new ProblemDetails()
+            };
             problem.Status = status;
             problem.Title = status switch
             {
@@ -55,6 +70,10 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
 
     private static (int Status, string Code) Classify(Exception error) => error switch
     {
+        RequestBodyLimitException => (413, "request_body_too_large"),
+        BadHttpRequestException { StatusCode: 413 } => (413, "request_body_too_large"),
+        BadHttpRequestException => (400, "validation_failed"),
+        OperationTimeoutException => (504, "operation_timeout"),
         RequestValidationException => (400, "validation_failed"),
         PoliceApiException upstream => (upstream.StatusCode, upstream.Code),
         ExportException { Code: "operation_busy", StatusCode: 409 } => (409, "operation_busy"),
@@ -62,4 +81,13 @@ public sealed class IngestionErrorMiddleware(RequestDelegate next, ILogger<Inges
         ExportException => (500, "export_failed"),
         _ => (500, "internal_error")
     };
+
+    private static ValidationProblemDetails SafeValidation(RequestValidationException validation)
+    {
+        var errors = new Dictionary<string, string[]>();
+        foreach (var key in new[] { "latitude", "longitude", "month" })
+            if (validation.Errors.ContainsKey(key)) errors[key] = ["Supply a valid " + key + "."];
+        if (errors.Count == 0) errors["request"] = ["Supply a valid request."];
+        return new(errors);
+    }
 }

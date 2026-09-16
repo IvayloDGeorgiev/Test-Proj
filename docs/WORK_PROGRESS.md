@@ -28,7 +28,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
-| 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
+| 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
 ## Dispatch ledger
@@ -46,6 +46,8 @@ Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target
 Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target: Stage 6 only, fresh isolated worktree from stage/05-crime-ingestion. Verified completion receipt: 03765894acb9b286f22a1ab3bfa6fa4120201e41; implementation: 648e5f04933bfc98cc5db47a2f78e52ea83f0296. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 5 task 01a0a9b0-de18-7820-86c4-c47251389de9. Duplicate check: no Stage 6 task in current task listing, no prior dispatch ledger entry and no remote Stage 6 branch. Client task ID: client-new-thread:0683b7e8-42fa-4535-86cc-95c66b23707f. Created UTC: 2026-09-16T10:19:08.5090467Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target: Stage 7 only, fresh isolated worktree from stage/06-stop-search-ingestion. Verified completion receipt: 8cbb6ac4e87bfe332b47b33b0f7e28ad82e08025; implementation: 196d3078f9e9c69d2c7e980699acb6a1f22717d0. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 6 task 01a0a9b9-f769-7d50-8769-d6d65bfa083e. Duplicate check: no Stage 7 task in current task listing, no prior dispatch ledger entry and no remote Stage 7 branch. Client task ID: client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371. Created UTC: 2026-09-16T10:28:58.2513128Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
+
+Dispatch key: Test-Proj:stage-08. State: CREATED (worktree setup queued). Target: Stage 8 only, fresh isolated worktree from stage/07-api-hardening. Verified completion receipt: bb387b09fc168f36a5e70467a0097db2d2a1bcb1; implementation: 8162d90dfe04b956847c455057d5fb7c57b47950. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 7 task 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1. Duplicate check: no Stage 8 task in current task listing, no prior dispatch ledger entry and no remote Stage 8 branch. Client task ID: client-new-thread:3495f7ec-a2b1-43c0-8de7-8081ccfe968a. Created UTC: 2026-09-16T10:41:39.5092892Z. Resolve actual task ID before using task-inspection tools. Child must reconcile latest remote predecessor dispatch ledger before claiming work. Stage 8 is final: no successor.
 
 ## Stage 1: Project and test foundation
 
@@ -193,26 +195,26 @@ Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target
 
 ## Stage 7: API limits and operational contracts
 
-- Status: NOT STARTED
+- Status: COMPLETED
 - Branch: stage/07-api-hardening
 - Prerequisites: Stage 6 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Owner/task ID: 01a0a9c2-f4b6-7631-95aa-e3d21b5adac1 (dispatch client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371)
+- Base SHA: 39b5a5b2338836cd6502a42fdc62d55cf5b9d839; remote predecessor implementation/receipt ancestry verified; final dispatch reconciled; no competing owner or branch.
+- Started (UTC): 2026-09-16T10:29:56.0168317Z
+- Completed (UTC): 2026-09-16T10:40:28.5308931Z
+- Commit SHA (implementation): 8162d90dfe04b956847c455057d5fb7c57b47950
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/07-api-hardening returned exactly 8162d90dfe04b956847c455057d5fb7c57b47950. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Scoped implementation and review complete; targeted/full tests and build passed. Implementation push independently verified; this receipt records completion. Claim f607515568fb6ffaf97dc7ba0c354ea490c8b8a1 pushed and independently verified.
+- Functionality implemented: Bounded request pre-read and server size feature; whole-operation TimeProvider deadline through export I/O; isolated ambient remaining budget for GET retry admission; caller/deadline distinction and post-publication caller token restoration; sanitized framework 400/415 and validation errors; stable 413/504 codes; safe structured result/error logs; OpenAPI statuses/types/problem media metadata on all three routes. Shared global admission audited without changing service/export retry semantics.
+- Tests added: 41 genuine AAA Api cases with real middleware/filter/transport/services/exporter and fake HTTP/I/O boundaries. Known/unknown-length input at/over limit and bounded reads; writable server feature; reduced/snapshotted bytes/time; deadline during input/export and caller cancellation; old-file/cleanup/lease safety; publication commit point and response token; remaining retry delay budget; all three datasets blocking every other route; error/status/synthetic-sensitive-string matrix; validation/media-type sanitization; OpenAPI status/type/content type metadata; upstream byte/row limits; cleanup failure primary-error preservation; cancellation during response writes/already-started response; concurrent request budget isolation.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Api --no-restore PASSED exit 0, 446 passed, 0 failed/skipped (Api occurs in every test namespace). Exact new-group filter FullyQualifiedName~Tests.Api PASSED exit 0, 41 passed, 0 failed/skipped, including final sanitization and content-type regressions.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 446 passed, 0 failed/skipped (405 predecessor + 41 new). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial test compilation failed because a logger helper shared the ILogger.Log method name; an initial broad rename also renamed the method. First discovered run passed 32 and failed 1: the synthetic marker payload overlapped the legitimate upstream_invalid_payload code. Later expanded run passed 41 but warned ASP0016 on test delegates returning an intentionally ignored result. Review identified that BadHttpRequestException 400 should also expose ValidationProblemDetails errors.
+- Root cause: C# member/class name collision and broad helper rename; ambiguous synthetic marker; generic Task result at a RequestDelegate boundary; incomplete 400 error-shape mapping.
+- Resolution: Renamed only the logger helper and restored interface method; used a distinct synthetic-upstream-body marker in both fixture and assertion; used explicit async Task lambdas; mapped HTTP 400 request errors to safe ValidationProblemDetails. Exact targeted regressions/full suite/build passed without warnings.
+- Regression test: Errors_StatusTable asserts 400 errors objects plus stable statuses/codes and no synthetic data. OpenApi_AllRoutes asserts exact status set, CLR schemas and application/problem+json metadata. Deadline_PublicationCommitPoint and RetryDelay_InputTimeConsumed preserve the two critical operational boundaries.
+- Notes / decisions: R7/R11/R12 and R19/R20 reviewed against requirements/architecture/security; no limit increases or dependencies added. Official call-limit page rechecked 2026-09-16 at https://data.police.uk/docs/api-call-limits/. Async-local budget avoids sharing state across requests. Input time consumes retry budget. Cancellation remains cooperative for synchronous OS durability/rename/cleanup calls; no detached background writes and no rollback after publication. README/architecture/security updated; host integration remains Stage 8. Existing net10.0 solution/application/namespace retained. Local settings never read/copied; tests use no live Police API or real Desktop. Explicit source/test/docs diff reviewed; generated outputs excluded.
 - Next stage: 8: Integration and final verification
 
 ## Stage 8: Integration and final verification
