@@ -10,6 +10,7 @@ builder.Services.AddIngestionOptions(builder.Configuration, builder.Environment)
 builder.Services.AddPoliceApiClient();
 builder.Services.AddCsvExport();
 builder.Services.AddScoped<IForcesIngestionService, ForcesIngestionService>();
+builder.Services.AddScoped<Test_Proj.Services.Crimes.ICrimesIngestionService, Test_Proj.Services.Crimes.CrimesIngestionService>();
 
 // Add services to the container.
 

@@ -265,6 +265,7 @@ public sealed class ForcesTests
 
     internal sealed class FakeClient : IPoliceApiClient
     {
+        public Task<IReadOnlyList<CrimeDto>> GetCrimesAsync(Test_Proj.Validation.LocationMonth request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public IReadOnlyList<ForceDto> Records { get; set; } = [new() { Id = "one", Name = "One" }];
         public Func<CancellationToken, Task<IReadOnlyList<ForceDto>>>? OnGet { get; set; }
         public int Calls { get; private set; }

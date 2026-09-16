@@ -35,6 +35,14 @@ public sealed class PoliceApiClient : IPoliceApiClient
     public Task<IReadOnlyList<ForceDto>> GetForcesAsync(CancellationToken cancellationToken = default) =>
         GetArrayAsync("forces", "forces", (ForceDto force) => force.IsValid(), cancellationToken);
 
+    public Task<IReadOnlyList<CrimeDto>> GetCrimesAsync(Test_Proj.Validation.LocationMonth request,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+        return GetArrayAsync("crimes-street/all-crime?" + request.ToQueryString(), "crimes",
+            (CrimeDto crime) => crime.IsValid(request.Month), cancellationToken);
+    }
+
     // Code-owned paths only. Dataset methods added in their own stages call this single retry owner.
     private async Task<IReadOnlyList<T>> GetArrayAsync<T>(string path, string dataset, Func<T, bool> validate,
         CancellationToken caller) where T : class

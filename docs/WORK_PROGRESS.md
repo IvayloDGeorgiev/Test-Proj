@@ -150,17 +150,17 @@ Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Stage 5 implemented and reviewed; all verification passed. Implementation push and completion receipt pending. Claim 824ef27b6da1d0d81dc21bfccb8424561b6a5322 pushed and independently verified.
+- Functionality implemented: POST /api/ingestion/crimes; nullable location/month request validation before side effects; typed all-crime GET with existing bounded transport; explicit nullable DTOs and eager row mapping; positive id, nonblank category and matching month required; finite bounded optional coordinates; shared singleton lease through publication; exact Crimes_YYYY-MM.csv schema, published count, header-only empty replacement; safe 400 ValidationProblemDetails and common sanitized errors.
+- Tests added: 64 genuine AAA Crimes tests using fake HTTP/client/export boundaries and real transport/mapping/service/controller/middleware, with real temporary-directory exports. Frozen official fixture; invariant URI/culture; exact UTF-8/CRLF schema and values; required fields/shapes/month, optional nested objects, unknown fields, formula/Unicode text; invalid request zero side effects; inclusive bounds; counts and replacement; null defensive boundaries; contention while retrieval/export pending; cancellation before/during/after retrieval and body reads, export and publication commit point; upstream statuses and size/row limits; publication failure preservation/cleanup; safe response and concrete validation errors.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Crimes --no-restore PASSED exit 0, 64 passed, 0 failed/skipped. Focused Crimes_NullRequest regression retest PASSED 1/1.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 331 passed, 0 failed/skipped (267 predecessor + 64 new). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial targeted run failed 1 validation-response test and passed 54. The expected errors property was missing. Inspected the middleware generic serialization type and reproduced with the focused regression.
+- Root cause: WriteAsJsonAsync inferred ProblemDetails from the base-typed variable, omitting the derived ValidationProblemDetails.Errors property.
+- Resolution: Serialize validation responses through their concrete ValidationProblemDetails type. Focused regression, expanded target suite, full suite and build all passed.
+- Regression test: Crimes_NullRequest_ReturnsSafeValidationProblemWithoutSideEffects asserts status 400, problem media type, validation_failed code, all three field errors and zero client/export calls.
+- Notes / decisions: Reviewed R2-R6/R8/R11/R13-R17/R19/R20 with architecture/security. Official crime contract rechecked 2026-09-16 at https://data.police.uk/docs/method/crime-street/ and example frozen. Numeric positive crime ID; optional street ID nonnegative; string coordinates explicitly validated/converted; optional outcome date stays text; month required and must match. Unknown fields ignored. Shared transport/security/export reused; no packages added; preserved net10.0 solution/application/namespace. README/architecture/.http updated. Full operation budget/input limits remain Stage 7, host binding integration Stage 8. Tests use no live API, real Desktop or local settings. Local configuration remains ignored/untracked and was never read/copied. Explicit source/test/docs review completed; no generated exports included.
 - Next stage: 6: Stop-and-search ingestion endpoint
 
 ## Stage 6: Stop-and-search ingestion endpoint
