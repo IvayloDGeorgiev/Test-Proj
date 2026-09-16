@@ -2,14 +2,18 @@
 
 The existing .NET 10 controller application now provides **POST /api/ingestion/forces**, **POST /api/ingestion/crimes** and **POST /api/ingestion/stop-searches**, with validated configuration, reusable Police API transport, safe CSV storage, and an xUnit suite. The WeatherForecast template has been removed.
 
-The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. No database is planned. Later stages retrieve public UK Police data and export Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv.
+The project remains `Test Proj/Test Proj.csproj`, namespace `Test_Proj`, in `Test Proj.slnx`. It retrieves public UK Police data and exports Forces.csv, Crimes_YYYY-MM.csv and StopSearches_YYYY-MM.csv. There is no database, background job, combined run route, or file download endpoint.
 
-From the repository root:
+Use Windows with the .NET 10 SDK and a trusted, account-owned output directory on a local fixed drive. Atomic replacement is verified on local NTFS. From the repository root:
 
 ```powershell
 dotnet restore "Test Proj.slnx"
 dotnet test "Test Proj.slnx" --no-restore
 dotnet build "Test Proj.slnx" --no-restore
+# First-time HTTPS setup, if the development certificate is not already trusted:
+dotnet dev-certs https --trust
+# Optional explicit root, avoiding dependence on Desktop availability:
+$env:Export__OutputRoot = Join-Path $env:LOCALAPPDATA 'PoliceDataIngestion'
 dotnet run --project "Test Proj/Test Proj.csproj" --launch-profile https
 ```
 
@@ -19,7 +23,7 @@ An optional `appsettings.Local.json` loads only in Development, before service r
 
 Options use sections `PoliceApi` and `Export`. PoliceApi defaults/maxima are: BaseUrl `https://data.police.uk/api/`, AttemptTimeoutSeconds 30, TotalOperationTimeoutSeconds 120, MaximumAttempts 3, MaximumResponseBytes 33554432 and MaximumRecords 100000. Positive limits may be reduced; attempt timeout cannot exceed total timeout. Export defaults/maxima are MaximumRequestBodyBytes 4096, MaximumConcurrentOperations exactly 1 and MaximumQueuedOperations exactly 0. OutputRoot has no production default. Options are validated at startup. The HTTP pipeline enforces the input limit and full-operation deadline; transport enforces upstream byte/record bounds, and all services share immediate global admission. Restart after configuration changes; local JSON reload is disabled to avoid changing trusted paths mid-operation.
 
-Foundation tests use synthetic configuration, temporary directories and a synthetic publish probe. They do not read local credentials, use the real Desktop or contact the Police API.
+All automated tests use synthetic configuration and temporary directories. The host suite runs the existing application through WebApplicationFactory with a fake HTTP handler and temporary content/output roots in both Development and Production. No test requires local credentials, the real Desktop or a live Police API connection. The foundation publish probe verifies exclusion using synthetic settings only. Run just the host suite with `dotnet test "tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj" --filter FullyQualifiedName~Integration --no-restore`.
 
 Stage 2 registers `IPoliceApiClient` through the typed HttpClient factory. `GetForcesAsync` returns validated id/name records, including an empty list for an empty array. All requests use the trusted HTTPS origin; redirects, cookies and automatic decompression are disabled. Response bytes are bounded while reading, before JSON parsing, and record counts are checked before DTO materialization. Malformed data and permanent statuses are never retried. Transient GET failures have at most three attempts, 500 ms exponential backoff plus up to 250 ms jitter (5-second cap), and Retry-After support that never retries early. An unfittable retry delay fails with a classified 503; exhausted timeouts classify as 504. Attempt and total retrieval deadlines include body reads and backoff. The HTTP operation deadline also covers request reading, mapping and export I/O.
 
@@ -41,7 +45,7 @@ Example response (completion time and count vary):
 {"success":true,"dataset":"forces","recordCount":1,"filename":"Forces.csv","completedAtUtc":"2026-09-16T10:00:00+00:00"}
 ```
 
-The result exposes only the filename and records actually exported. Empty results publish a header-only file and return zero. Repeated requests replace Forces.csv. Errors return `application/problem+json` with stable `code` and `traceId`: contention 409; invalid upstream data or exhausted network/server failures 502; rate limiting or insufficient retry budget 503; retrieval timeout 504; local export/configuration or unexpected failure 500. Error responses and application error logs omit raw exception details, upstream bodies and paths. Caller cancellation propagates through retrieval/export and does not create a response to a disconnected caller. Cancellation after atomic publication cannot undo the committed file. The full operation deadline and HTTP resource limits are enforced; host integration tests remain Stage 8 work.
+The result exposes only the filename and records actually exported. Empty results publish a header-only file and return zero. Repeated requests replace Forces.csv. Errors return `application/problem+json` with stable `code` and `traceId`: contention 409; invalid upstream data or exhausted network/server failures 502; rate limiting or insufficient retry budget 503; retrieval timeout 504; local export/configuration or unexpected failure 500. Error responses and application error logs omit raw exception details, upstream bodies and paths. Caller cancellation propagates through retrieval/export and does not create a response to a disconnected caller. Cancellation after atomic publication cannot undo the committed file. The full operation deadline and HTTP resource limits are verified through the host.
 
 ## Crimes endpoint
 
@@ -55,14 +59,14 @@ All three values are required. Coordinates must be finite and within [-90,90] / 
 
 HTTP 200 returns the common result with dataset `crimes`, the published row count and filename `Crimes_2024-01.csv`. Exact columns are `id,persistent_id,category,month,latitude,longitude,street_id,street_name,location_type,context,outcome_category,outcome_date`. Crime id is a positive integer, category is nonblank and month must equal the requested month. Missing/null location, street, outcome and optional members become empty cells. Present coordinates must parse as finite invariant numbers within geographic bounds; street IDs are nonnegative integers. Wrong shapes fail the whole operation with sanitized 502 before export. Text is formula-protected, while negative coordinates remain numeric. Empty results replace the file with its header only. Repeating a month replaces the same file even for different coordinates.
 
-The [official street crime contract](https://data.police.uk/docs/method/crime-street/) was rechecked on 2026-09-16 and its example frozen in tests. Locations are approximate. The service shares the forces admission gate and holds it from retrieval through publication. Cancellation/error/publication semantics and remaining Stage 8 host verification are the same as for forces.
+The [official street crime contract](https://data.police.uk/docs/method/crime-street/) was rechecked on 2026-09-16 and its example frozen in tests. Locations are approximate. The service shares the forces admission gate and holds it from retrieval through publication. Cancellation, error and publication semantics are verified through the host as for forces.
 ## Stop/search endpoint
 
 POST JSON `{"latitude":53.8008,"longitude":-1.5491,"month":"2024-01"}` to `https://localhost:7046/api/ingestion/stop-searches`. Validation and replacement rules match crimes. The code-owned stops-street query retrieves one point/month. HTTP 200 reports dataset `stop-searches`, the published count and filename `StopSearches_2024-01.csv`; no absolute path is returned.
 
 Exact columns: `type,datetime,age_range,gender,self_defined_ethnicity,officer_defined_ethnicity,legislation,object_of_search,outcome,involved_person,operation,operation_name,latitude,longitude,street_id,street_name`. Type must be nonblank. Datetime must be a valid ISO timestamp with seconds and an explicit Z or numeric offset; up to seven fractional digits are retained. Export uses round-trip ISO formatting, preserving the offset without inferring local time. No fabricated identifier or derived demographics are added. Optional strings, location/street members and booleans may be absent/null; boolean cells distinguish true, false and empty. Optional coordinates and street IDs use the same validation as crimes. Invalid shapes fail the whole operation before export. Outcome accepts text, null, or the documented JSON false, exported as `false`; true/numbers/objects are rejected.
 
-The [official area stop/search contract](https://data.police.uk/docs/method/stops-street/) was rechecked on 2026-09-16 and its first example record frozen in tests. Locations are approximate. Timestamps are preserved without imposing an additional returned-month equality rule. The service holds the shared admission lease through publication, writes header-only empty results, and uses the common cancellation and sanitized error behavior. Full operation budgets/input limits are enforced; host binding integration remains Stage 8.
+The [official area stop/search contract](https://data.police.uk/docs/method/stops-street/) was rechecked on 2026-09-16 and its first example record frozen in tests. Locations are approximate. Timestamps are preserved without imposing an additional returned-month equality rule. The service holds the shared admission lease through publication, writes header-only empty results, and uses the common cancellation and sanitized error behavior. Full operation budgets, input limits and host binding are verified for this route.
 ## Operational contracts
 
 All ingestion routes buffer at most 4097 incoming bytes to enforce the default 4096-byte limit before model binding or ingestion side effects, including unknown-length/chunked input. Content-Length above the limit is rejected immediately. The request-specific server body limit is also set where supported. Operators may lower the validated limit. Invalid JSON/model binding returns sanitized validation ProblemDetails 400; unsupported content type returns sanitized 415. Framework parser messages, supplied field names and exception text are not reflected.
@@ -84,6 +88,20 @@ A TimeProvider-backed deadline starts before input reading and flows through req
 Errors contain code and traceId with application/problem+json. Caller cancellation propagates through waits and I/O without attempting a disconnected response. Cancellation is cooperative: synchronous filesystem operations cannot be forcibly interrupted; the exporter checks cancellation before atomic publication. An already committed publication remains successful, and response serialization then uses the caller token rather than the expired operation token. No post-publication rollback or whole-export retry occurs. Cleanup failures preserve the primary result and log export_cleanup_failed; operator cleanup may be needed.
 
 Safe application logs contain dataset, trace, attempt/status class (transport), published record count, elapsed time and result codes. They omit payloads, full query strings, credentials and local paths. Keep framework hosting/model-binding logs at the supplied Warning level; enabling verbose framework or HTTP body logging can disclose request data. OpenAPI declares success, validation and operational failure response types/media types for every route. Repeated successful calls intentionally replace the dataset/month file, including header-only empty results.
+
+With the HTTPS profile running, Development exposes the generated document at `https://localhost:7046/openapi/v1.json`; Production does not expose it. The document declares required JSON bodies for crimes and stop/searches and an integer result count. Request members are nullable at the binding boundary so missing/null values can be rejected safely; the coordinate/month rules above are enforced by validation before upstream calls. There is no Swagger UI package.
+
+The `.http` file contains all three requests. Equivalent PowerShell examples (each performs a real export when you run it):
+
+```powershell
+$base = 'https://localhost:7046/api/ingestion'
+Invoke-RestMethod -Method Post -Uri "$base/forces"
+$body = @{ latitude = 53.8008; longitude = -1.5491; month = '2024-01' } | ConvertTo-Json
+Invoke-RestMethod -Method Post -Uri "$base/crimes" -ContentType 'application/json' -Body $body
+Invoke-RestMethod -Method Post -Uri "$base/stop-searches" -ContentType 'application/json' -Body $body
+```
+
+This is a trusted local service. Public hosting, authentication, distributed concurrency, output retention and filesystem permissions remain operator/deployment boundaries described in SECURITY.md. TestServer verifies the application pipeline; TLS and deployment-specific web server limits need verification in the intended deployment. The final isolated suite contains 566 passing cases (120 host integration cases), with requirement evidence in [TEST_STRATEGY.md](docs/TEST_STRATEGY.md) and verified commit/push records in [WORK_PROGRESS.md](docs/WORK_PROGRESS.md).
 
 ## Development documentation
 

@@ -29,7 +29,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | COMPLETED |
-| 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
+| 8 | Integration and final verification | stage/08-integration-verification | IN PROGRESS |
 
 ## Dispatch ledger
 
@@ -219,24 +219,24 @@ Dispatch key: Test-Proj:stage-08. State: CREATED (worktree setup queued). Target
 
 ## Stage 8: Integration and final verification
 
-- Status: NOT STARTED
+- Status: COMPLETED
 - Branch: stage/08-integration-verification
 - Prerequisites: Stage 7 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
-- Next stage: None; report final completion
+- Owner/task ID: 01a0a9ce-9bae-7f12-ab38-4d74e1db8172 (dispatch client-new-thread:3495f7ec-a2b1-43c0-8de7-8081ccfe968a)
+- Base SHA: 21d1544cad9152bf570bca5854521c49df9dd90e; latest remote dispatch reconciled; Stage 7 implementation and receipt ancestry verified; no competing branch/owner.
+- Started (UTC): 2026-09-16T10:42:38.0546769Z
+- Completed (UTC): 2026-09-16T11:04:14.9870747Z
+- Commit SHA (implementation): 152a766a5aadb570325cbe2cda6a59c937c88574
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/08-integration-verification returned exactly 152a766a5aadb570325cbe2cda6a59c937c88574. This documentation-only receipt is pushed and independently verified below.
+- Summary: Host integration, requirements audit and documentation finalization complete; implementation commit pending verified push.
+- Functionality implemented: Added WebApplicationFactory host coverage with synthetic HTTP/configuration and temporary roots; exposed partial Program; corrected required request-body OpenAPI metadata and strict integer result schema; finalized setup, traceability and security documentation.
+- Tests added: 120 genuine Integration cases covering all three routes, binding, OpenAPI, 400/409/413/415/500/502/503/504, safe logs, upstream retry/limits, global contention, caller/attempt/operation cancellation, input budget and publication commit-point serialization.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Integration --no-restore PASSED exit 0, 120 passed, 0 failed/skipped.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 566 passed, 0 failed/skipped (446 predecessor + 120 Stage 8).
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors. Restore passed with Microsoft.AspNetCore.Mvc.Testing 10.0.12; vulnerability audit reported no vulnerable packages.
+- Issues encountered / investigation: Initial host run exposed that generated OpenAPI represented nullable request bodies as oneOf null/ref and the result count schema as integer/string; a caller-cancellation test initially read the aborted TestServer response body and a custom logger helper did not signal cancellation.
+- Root cause: Nullable controller parameter metadata and default JSON number metadata did not match the documented contract; TestServer correctly aborts response reads after caller cancellation; fixture logger helper needed explicit caller-cancel signaling.
+- Resolution: Made crime/stop request parameters nonnullable while retaining defensive nullable service contracts; added strict JsonNumberHandling metadata to RecordCount; asserted aborted response stream semantics and fixed test sink signaling. Retargeted OpenAPI and cancellation regressions passed.
+- Regression test: HostFailureTests.OpenApi_Development_GeneratedDocumentDescribesActualRoutesSchemasAndMediaTypes; HostCancellationTests.Cancellation_UpstreamPending_DistinguishesAttemptDeadlineAndCaller; Input_PendingRead_ConsumesOperationBudgetAndPropagatesCallerCancellation.
+- Notes / decisions: Audited R1-R20 against REQUIREMENTS/ARCHITECTURE/SECURITY; no live Police API, real Desktop or local settings. TestServer does not claim deployment TLS/reverse-proxy/OS ownership behavior. Documentation now includes setup, examples, OpenAPI access, test command and operator boundaries.
+- Next stage: None; Stage 8 is final.

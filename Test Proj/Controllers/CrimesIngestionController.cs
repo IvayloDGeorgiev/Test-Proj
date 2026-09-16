@@ -19,6 +19,6 @@ public sealed class CrimesIngestionController(ICrimesIngestionService crimes) : 
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status502BadGateway, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status503ServiceUnavailable, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status504GatewayTimeout, "application/problem+json")]
-    public async Task<ActionResult<IngestionResult>> Crimes([FromBody] LocationMonthRequest? request) =>
+    public async Task<ActionResult<IngestionResult>> Crimes([FromBody] LocationMonthRequest request) =>
         Ok(await crimes.IngestAsync(request, HttpContext.RequestAborted));
 }

@@ -15,10 +15,9 @@ Accept: application/json
   "month": "2024-01"
 }
 
-###
-
 ### Stop/search ingestion (replaces this month's file, including empty results)
-POST https://localhost:7046/api/ingestion/stop-searches
+POST {{Test_Proj_HostAddress}}/api/ingestion/stop-searches
 Content-Type: application/json
+Accept: application/json
 
 {"latitude":53.8008,"longitude":-1.5491,"month":"2024-01"}
