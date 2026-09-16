@@ -219,15 +219,15 @@ Dispatch key: Test-Proj:stage-08. State: CREATED (worktree setup queued). Target
 
 ## Stage 8: Integration and final verification
 
-- Status: IN PROGRESS
+- Status: COMPLETED
 - Branch: stage/08-integration-verification
 - Prerequisites: Stage 7 completed and remote receipt verified
 - Owner/task ID: 01a0a9ce-9bae-7f12-ab38-4d74e1db8172 (dispatch client-new-thread:3495f7ec-a2b1-43c0-8de7-8081ccfe968a)
 - Base SHA: 21d1544cad9152bf570bca5854521c49df9dd90e; latest remote dispatch reconciled; Stage 7 implementation and receipt ancestry verified; no competing branch/owner.
 - Started (UTC): 2026-09-16T10:42:38.0546769Z
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
+- Completed (UTC): 2026-09-16T11:04:14.9870747Z
+- Commit SHA (implementation): 152a766a5aadb570325cbe2cda6a59c937c88574
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/08-integration-verification returned exactly 152a766a5aadb570325cbe2cda6a59c937c88574. This documentation-only receipt is pushed and independently verified below.
 - Summary: Host integration, requirements audit and documentation finalization complete; implementation commit pending verified push.
 - Functionality implemented: Added WebApplicationFactory host coverage with synthetic HTTP/configuration and temporary roots; exposed partial Program; corrected required request-body OpenAPI metadata and strict integer result schema; finalized setup, traceability and security documentation.
 - Tests added: 120 genuine Integration cases covering all three routes, binding, OpenAPI, 400/409/413/415/500/502/503/504, safe logs, upstream retry/limits, global contention, caller/attempt/operation cancellation, input budget and publication commit-point serialization.
