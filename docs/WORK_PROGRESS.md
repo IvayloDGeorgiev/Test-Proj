@@ -26,7 +26,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 2 | Police API transport and validation | stage/02-police-api-client | COMPLETED |
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
-| 5 | Crime ingestion endpoint | stage/05-crime-ingestion | NOT STARTED |
+| 5 | Crime ingestion endpoint | stage/05-crime-ingestion | IN PROGRESS |
 | 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
@@ -141,12 +141,12 @@ Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target
 
 ## Stage 5: Crime ingestion endpoint
 
-- Status: NOT STARTED
+- Status: IN PROGRESS
 - Branch: stage/05-crime-ingestion
 - Prerequisites: Stage 4 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
+- Owner/task ID: 01a0a9b0-de18-7820-86c4-c47251389de9 (dispatch client-new-thread:b02bd110-786d-42bf-ba17-1b4f3006e9d9)
+- Base SHA: 4b49b854feebcecaa68c95151ac8d1813213fb6b; predecessor implementation and receipt ancestry and remote tip verified; dispatch reconciled.
+- Started (UTC): 2026-09-16T10:10:11.5664197Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
