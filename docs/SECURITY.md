@@ -29,6 +29,8 @@ Configure the output root through trusted operator settings. Desktop fallback is
 
 CSV protective prefixes deliberately alter unsafe text cells. CSV quoting alone does not prevent formulas. Tests include =,+,-,@, leading spaces, tabs, CR/LF and negative numeric coordinates.
 
+Stage 3 tests exercise live Windows junctions (including dangling roots and linked ancestors/destinations), write-time root changes, exclusive temporary handles, actual locked destination failures, injected write/flush/permission/publication failures, cancellation during writes, and atomic replacement on NTFS. Link tests run without capability skips. Cleanup refuses to follow an altered root; a cleanup failure logs only a stable code and may leave a temporary file for the operator. Root ownership remains mandatory because path checks and publication are separate OS operations. Atomic replacement is verified for the local NTFS filesystem used by the test host; other local filesystem deployments must verify their rename/replace guarantees before use.
+
 Exports may include sensitive public records; avoid logging row content and do not commit generated CSVs. Place production/local exports outside the repository. Output retention and access permissions are operator responsibilities; no automatic deletion policy is introduced.
 
 Security is implemented in Stages 1-7 with each relevant feature and verified end-to-end in Stage 8. Reference [Police API call limits](https://data.police.uk/docs/api-call-limits/) during implementation; application budgets must remain conservative even if upstream limits change.

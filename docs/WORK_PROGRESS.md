@@ -98,17 +98,17 @@ Dispatch key: Test-Proj:stage-03. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Ownership claimed in the isolated Stage 3 worktree; no competing branch or task found.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Stage 3 implementation and review finished; targeted/full tests and build pass. IN PROGRESS pending implementation push and separate completion receipt. Claim 45467d4d101a78d6a319c243d4e376b2adefa694 pushed and remote tip independently matched.
+- Functionality implemented: Strict BOM-free UTF-8/CRLF CSV; exact code-owned schemas and validated-month filenames; formula-protected text, separate invariant finite numeric/boolean/offset timestamp cells; singleton immediate operation lease with same-lease write exclusion; root/path containment and link/reparse checks before writes and publication; unique exclusive same-directory temporary files; flush/close then atomic move/replace; preservation of prior files, cancellation propagation, sanitized failures and safe cleanup warnings. Registered reusable export services only; no ingestion endpoint added.
+- Tests added: 66 genuine AAA Stage 3 cases covering exact escaping/formula/Unicode/null records, schema/header order, culture/numbers/nonfinite values, filename traversal/absolute/UNC/sibling traps, actual Windows junctions and dangling/ancestor/destination links, root changes after startup and before publication, root-as-file, missing-root creation and immutable configuration snapshot, unique temp placement/closed handles, existing-reader atomic replacement, empty replacement, actual locked destination and injected permission/write/flush/publication failures, row/encoding failure, cancellation before/during writes/after last row/at commit point, cleanup error sanitization, singleton cross-scope admission, simultaneous contention, lease reuse/foreign/disposed/premature disposal and release.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Export --no-restore PASSED exit 0, 86 passed, 0 failed/skipped (66 new export + 20 matching prior foundation cases). Exact new namespace filter FullyQualifiedName~PoliceDataIngestion.Api.Tests.Export PASSED exit 0, 66 passed. Earlier incremental export runs passed 70 and 81 cases.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 231 passed, 0 failed/skipped (165 predecessor + 66 Stage 3). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: First targeted run passed but emitted CS8631 from a nullable Path.GetFileName method-group projection in an expected-filename assertion. Inspected overload inference. Review identified StreamWriter disposal could flush buffered text outside the explicit cancellation-aware write path; simplified to direct strict UTF-8 record writes. No failing tests or unresolved implementation defects occurred.
+- Root cause: Nullable method-group inference selected an assertion overload with incompatible nullable generic constraints. StreamWriter disposal introduces an implicit flush independent of the operation token.
+- Resolution: Use a lambda retaining nonnull flow for known filenames, preserving the exact expected filenames. Encode each record directly and pass the token to stream writes/flush; remove the extra text buffer. All targeted/full tests and build subsequently passed without warnings.
+- Regression test: Export_CodeOwnedSchemas_WritesExactHeaderOnlyFiles retains exact filenames/headers. Export_CancelledDuringFileWrite_PropagatesTokenAndCleansTemporary verifies actual pending stream I/O cancellation, token identity, old-file preservation and cleanup. Export_CancelledAfterLastRow_StopsBeforePublication covers the boundary after enumeration. Other fault/lease/path tests prove independently observable failure behavior.
+- Notes / decisions: R13-R17 and stage R19/R20 reviewed against requirements, architecture and security. Windows C volume is NTFS; real move/replace and old-reader behavior verified there. Root remains an operator-owned trust boundary; path checks do not eliminate malicious OS races. If a root changes into a link or deletion itself fails, cleanup refuses unsafe traversal and logs only export_cleanup_failed; operator may need to remove a leftover temp. Publication is the commit point; cancellation afterward cannot undo success. No packages added; net10.0 solution/namespace/template retained. Dataset mapping/endpoints and full-operation deadline remain in their assigned stages. README/architecture/security updated; no live HTTP, real Desktop or local configuration access. Local configuration remains ignored/untracked and was never read/copied; generated files use temporary test roots only.
 - Next stage: 4: Forces ingestion endpoint
 
 ## Stage 4: Forces ingestion endpoint
