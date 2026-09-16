@@ -9,6 +9,7 @@ builder.Configuration.AddDevelopmentLocalConfiguration(builder.Environment);
 builder.Services.AddIngestionOptions(builder.Configuration, builder.Environment);
 builder.Services.AddPoliceApiClient();
 builder.Services.AddCsvExport();
+builder.Services.AddScoped<Test_Proj.Services.StopSearches.IStopSearchesIngestionService, Test_Proj.Services.StopSearches.StopSearchesIngestionService>();
 builder.Services.AddScoped<IForcesIngestionService, ForcesIngestionService>();
 builder.Services.AddScoped<Test_Proj.Services.Crimes.ICrimesIngestionService, Test_Proj.Services.Crimes.CrimesIngestionService>();
 

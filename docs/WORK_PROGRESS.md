@@ -27,7 +27,7 @@ This file is the authoritative runtime tracker. Allowed statuses: NOT STARTED, I
 | 3 | Safe CSV and file export | stage/03-csv-export | COMPLETED |
 | 4 | Forces ingestion endpoint | stage/04-forces-ingestion | COMPLETED |
 | 5 | Crime ingestion endpoint | stage/05-crime-ingestion | COMPLETED |
-| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | NOT STARTED |
+| 6 | Stop-and-search ingestion endpoint | stage/06-stop-search-ingestion | COMPLETED |
 | 7 | API limits and operational contracts | stage/07-api-hardening | NOT STARTED |
 | 8 | Integration and final verification | stage/08-integration-verification | NOT STARTED |
 
@@ -44,6 +44,8 @@ Dispatch key: Test-Proj:stage-04. State: CREATED (worktree setup queued). Target
 Dispatch key: Test-Proj:stage-05. State: CREATED (worktree setup queued). Target: Stage 5 only, fresh isolated worktree from stage/04-forces-ingestion. Verified completion receipt: f646c9a2dc983b9bd35fa4877af16156527b08ad; implementation: 2d396373206fdc526f212d09f7d209097ab1fba1. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 4 task 01a0a9a8-5ee4-7450-b19c-a0aaba75e2a8. Duplicate check: no Stage 5 task in current task listing, no prior dispatch ledger entry and no remote Stage 5 branch. Client task ID: client-new-thread:b02bd110-786d-42bf-ba17-1b4f3006e9d9. Created UTC: 2026-09-16T10:09:12.5414669Z. Resolve the actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target: Stage 6 only, fresh isolated worktree from stage/05-crime-ingestion. Verified completion receipt: 03765894acb9b286f22a1ab3bfa6fa4120201e41; implementation: 648e5f04933bfc98cc5db47a2f78e52ea83f0296. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 5 task 01a0a9b0-de18-7820-86c4-c47251389de9. Duplicate check: no Stage 6 task in current task listing, no prior dispatch ledger entry and no remote Stage 6 branch. Client task ID: client-new-thread:0683b7e8-42fa-4535-86cc-95c66b23707f. Created UTC: 2026-09-16T10:19:08.5090467Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
+
+Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target: Stage 7 only, fresh isolated worktree from stage/06-stop-search-ingestion. Verified completion receipt: 8cbb6ac4e87bfe332b47b33b0f7e28ad82e08025; implementation: 196d3078f9e9c69d2c7e980699acb6a1f22717d0. Both pushes independently verified using git ls-remote on 2026-09-16. Coordinator: Stage 6 task 01a0a9b9-f769-7d50-8769-d6d65bfa083e. Duplicate check: no Stage 7 task in current task listing, no prior dispatch ledger entry and no remote Stage 7 branch. Client task ID: client-new-thread:fe3ea6cc-2fb4-4699-b809-68aa192b1371. Created UTC: 2026-09-16T10:28:58.2513128Z. Resolve actual task ID before using task-inspection tools. Child must reconcile the latest remote predecessor dispatch ledger before claiming work.
 
 ## Stage 1: Project and test foundation
 
@@ -167,26 +169,26 @@ Dispatch key: Test-Proj:stage-06. State: CREATED (worktree setup queued). Target
 
 ## Stage 6: Stop-and-search ingestion endpoint
 
-- Status: NOT STARTED
+- Status: COMPLETED
 - Branch: stage/06-stop-search-ingestion
 - Prerequisites: Stage 5 completed and remote receipt verified
-- Owner/task ID: —
-- Base SHA: —
-- Started (UTC): —
-- Completed (UTC): —
-- Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Owner/task ID: 01a0a9b9-f769-7d50-8769-d6d65bfa083e (dispatch client-new-thread:0683b7e8-42fa-4535-86cc-95c66b23707f)
+- Base SHA: bdc4ec3bfeda54a96af6088af8756ced968b769b; predecessor implementation/receipt ancestry and remote tip verified; final dispatch update reconciled; no competing branch/task found.
+- Started (UTC): 2026-09-16T10:20:20.9086464Z
+- Completed (UTC): 2026-09-16T10:27:46.3799122Z
+- Commit SHA (implementation): 196d3078f9e9c69d2c7e980699acb6a1f22717d0
+- Push evidence / receipt: Implementation push succeeded 2026-09-16; git ls-remote origin refs/heads/stage/06-stop-search-ingestion returned exactly 196d3078f9e9c69d2c7e980699acb6a1f22717d0. This documentation-only receipt must also be pushed and independently verified before dispatch.
+- Summary: Scoped implementation and review complete; all tests/build passed. Implementation push independently verified; this receipt records completion. Claim 7ebeb469247205c4dd36aab3bf3c569141fef303 pushed and independently verified.
+- Functionality implemented: POST /api/ingestion/stop-searches; code-owned stops-street location/month query; explicit optional demographics/location and nullable boolean mapping; required type/offset timestamp; documented outcome string/null/false support; exact StopSearches_YYYY-MM.csv schema; shared lease through publication, common safe result, validation and middleware.
+- Tests added: 74 genuine AAA StopSearches tests with fake HTTP/client/export boundaries and real transport/mapping/service/controller/middleware and temporary CSV output. Frozen official example, exact UTF-8/CRLF schema/query/culture/count, timestamp offsets/fractions, booleans/optional fields, outcome false/null/text, formula/Unicode/CSV escaping, invalid input zero side effects, invalid arrays/fields/defensive client records, empty replacement, contention during retrieval/export, token propagation/cancellation/publication commit point, timeout/status/size/row limits, publication failure old-file preservation and cleanup, safe validation response.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~StopSearches --no-restore PASSED exit 0, 74 passed, 0 failed/skipped. Initial 65-case run also passed.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 405 passed, 0 failed/skipped (331 predecessor + 74 new). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: An unused preliminary test-scaffolding substring lookup emitted an index error; the subsequent correct lookup generated the intended test file. Inspected resulting code and compilation/discovery. Diff check found trailing blank lines introduced by shell writes. No test/build failures.
+- Root cause: Preliminary lookup used an absent method-name marker; shell Set-Content appended an extra newline.
+- Resolution: Used the actual pending-retrieval method marker, reviewed generated tests and removed trailing blank lines. Full target suite, full suite and build passed.
+- Regression test: No application defect discovered. OutcomeContract tests explicitly cover the official false union; invalid timestamp cases prevent local-time inference.
+- Notes / decisions: Reviewed R2-R6/R8/R11/R13-R17/R19/R20 with architecture/security and official https://data.police.uk/docs/method/stops-street/ (2026-09-16). Explicit-offset ISO timestamps preserve up to seven fractional digits; no returned-month equality restriction added. Outcome false is accepted per official contract, other unexpected shapes rejected. Shared coordinate DTO validation reused. No packages added; net10.0 solution/application/namespace preserved. README/architecture/.http updated. Full-operation budgets/input limits remain Stage 7; host binding tests Stage 8. Intended source/test/documentation staged diff and status reviewed; whitespace check passed; no generated exports included. Local settings remain ignored/untracked and were never read/copied; tests use no live API or Desktop.
 - Next stage: 7: API limits and operational contracts
 
 ## Stage 7: API limits and operational contracts

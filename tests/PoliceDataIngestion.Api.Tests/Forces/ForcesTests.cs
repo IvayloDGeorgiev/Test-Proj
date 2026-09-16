@@ -270,6 +270,7 @@ public sealed class ForcesTests
         public Func<CancellationToken, Task<IReadOnlyList<ForceDto>>>? OnGet { get; set; }
         public int Calls { get; private set; }
         public CancellationToken Token { get; private set; }
+        public Task<IReadOnlyList<StopSearchDto>> GetStopSearchesAsync(Test_Proj.Validation.LocationMonth request, CancellationToken cancellationToken = default) => throw new NotSupportedException();
         public Task<IReadOnlyList<ForceDto>> GetForcesAsync(CancellationToken cancellationToken = default)
         { Calls++; Token = cancellationToken; return OnGet?.Invoke(cancellationToken) ?? Task.FromResult(Records); }
     }
