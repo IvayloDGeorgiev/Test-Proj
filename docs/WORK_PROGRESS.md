@@ -67,22 +67,22 @@ Dispatch key: Test-Proj:stage-02. State: CREATED (worktree setup queued). Target
 - Branch: stage/02-police-api-client
 - Prerequisites: Stage 1 completed and remote receipt verified
 - Owner/task ID: 01a0a98c-d3a2-7141-bd2a-4c419d020287 (dispatch client-new-thread:8b492d04-0bb3-499d-9f01-dacae6b5f238)
-- Base SHA: 4de254dab154d4b896f69703eb086cf5235148d3; predecessor implementation/receipt ancestry and remote tip verified.
+- Base SHA: 4de254dab154d4b896f69703eb086cf5235148d3; predecessor implementation 5bcc1fb6936f7461b426d6575c9842f5e187c97c and receipt a0b9cad1e53a6fb4bde9cf69a483af9364714ebf ancestry verified. Remote predecessor dispatch-only update reconciled before claim.
 - Started (UTC): 2026-09-16T09:31:02.1157548Z
 - Completed (UTC): —
 - Commit SHA (implementation): —
-- Push evidence / receipt: —
-- Summary: Ownership claimed after reconciling remote dispatch ledger; implementation pending.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Push evidence / receipt: Ownership claim ce758f6c7b01c8482c4be131c89a7935c41d6fb9 pushed and remote tip independently matched with git ls-remote. Implementation push pending.
+- Summary: Scoped implementation and verification complete; remains IN PROGRESS until implementation push and receipt gate.
+- Functionality implemented: Typed forces client, DTO/required-field validation, bounded reusable JSON array reader, immutable coordinate/month validation and invariant query formatting, exact origin snapshot, redirects/cookies/decompression disabled, safe structured logging without URL loggers, classified safe failures, bounded transient GET retries, injectable monotonic clock/timers/jitter, Retry-After minimums and caller cancellation. No ingestion endpoints, crime/stop DTOs or CSV exporter added.
+- Tests added: 109 genuine AAA cases using scripted HttpMessageHandler and manual TimeProvider; valid/invalid arrays, fields and shapes, unknown fields, URI/method/token, response disposal, byte/record boundaries (known/unknown/misreported content length), partial body I/O failure, all retryable/permanent statuses, network classifications, Retry-After delta/date/past/malformed/zero/beyond budget, exhausted attempts, attempt/total timeouts, cancellation before/during send/body/backoff, safe logs/errors, actual DI handler settings, options snapshots, coordinates and ASCII calendar months with non-English culture.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~PoliceApi --no-restore PASSED exit 0, 109 passed, 0 failed/skipped. Validation-only regression retest passed 30 cases; earlier expanded transport run passed 102.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 165 passed, 0 failed/skipped (56 foundation + 109 Stage 2). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial prerequisite fetch failed under app-only sandbox metadata/network restrictions; approved retry succeeded. First targeted run had 12 failed cases and 86 passed: xUnit reflection rejected Int32 zero InlineData values for nullable Double parameters before invoking validation. Inspected stack traces and corrected fixture literal types. Review also identified the need to distinguish nontransient HttpRequestError categories rather than retry all transport exceptions.
+- Root cause: Test data used integer literals for nullable-double theory arguments; xUnit did not coerce these. Broad transport catch would retry certificate/authentication/protocol/configuration failures unnecessarily.
+- Resolution: Use double zero literals without changing cases/assertions; validation regression rerun passed. Restrict retries to transient network categories and body I/O failures, classify remaining transport failures immediately. Full access later enabled by user; root tests/docs and Git operations no longer require approval.
+- Regression test: Create_InvalidCoordinates_RejectsBeforeHttp retains all 12 boundary/null/nonfinite cases and asserts zero sends. GetForces_ClassifiedTransportFailure_RetriesOnlyTransientErrors adds seven classifications and asserts exact send counts and sanitized diagnostics. Body-read failure regression asserts partial data discarded and stream disposed before retry.
+- Notes / decisions: Reviewed R5/R8-R12 transport, R18 transport controls and R19/R20 against architecture/security. Official forces and API call-limit docs rechecked 2026-09-16 (https://data.police.uk/docs/method/forces/ and https://data.police.uk/docs/api-call-limits/). Both force fields required nonblank; unknown fields ignored. Bounded buffering chosen over unbounded streaming; at most configured bytes plus JSON/DTO overhead. Retrieval budget covers HTTP/body/backoff now; full export budget remains Stage 7. ProblemDetails translation remains Stage 4/7. Existing net10.0 solution/namespace/template retained; no packages added. Tests never contact Police API, read local configuration or use real Desktop. README/architecture updated. Secret path ignored/untracked; contents never accessed/copied. Intended source/test/documentation diff reviewed; whitespace check passed, staged filenames contain only intended files and no local settings or generated exports. No unresolved stage errors.
 - Next stage: 3: Safe CSV and file export
 
 ## Stage 3: Safe CSV and file export

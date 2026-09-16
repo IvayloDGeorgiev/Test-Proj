@@ -1,8 +1,10 @@
 using Test_Proj.Options;
+using Test_Proj.Clients.PoliceApi;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddDevelopmentLocalConfiguration(builder.Environment);
 builder.Services.AddIngestionOptions(builder.Configuration, builder.Environment);
+builder.Services.AddPoliceApiClient();
 
 // Add services to the container.
 
