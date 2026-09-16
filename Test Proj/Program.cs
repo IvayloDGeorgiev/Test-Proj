@@ -15,12 +15,24 @@ builder.Services.AddScoped<Test_Proj.Services.Crimes.ICrimesIngestionService, Te
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options => options.Filters.Add<IngestionResultFilter>())
+    .ConfigureApiBehaviorOptions(options => options.InvalidModelStateResponseFactory = context =>
+    {
+        var problem = new Microsoft.AspNetCore.Mvc.ValidationProblemDetails(
+            new Dictionary<string, string[]> { ["request"] = ["Supply a valid JSON request."] })
+        { Status = 400, Title = "Request validation failed.", Type = "about:blank" };
+        problem.Extensions["code"] = "validation_failed";
+        problem.Extensions["traceId"] = context.HttpContext.TraceIdentifier;
+        var result = new Microsoft.AspNetCore.Mvc.BadRequestObjectResult(problem);
+        result.ContentTypes.Add("application/problem+json");
+        return result;
+    });
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
 app.UseMiddleware<IngestionErrorMiddleware>();
+app.UseMiddleware<IngestionLimitsMiddleware>();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

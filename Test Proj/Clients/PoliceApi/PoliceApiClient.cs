@@ -123,7 +123,10 @@ public sealed class PoliceApiClient : IPoliceApiClient
                 var backoff = TimeSpan.FromMilliseconds(Math.Min(5000,
                     500 * Math.Pow(2, attempt - 1) + 250 * Math.Clamp(jitter.NextFraction(), 0, 1)));
                 var delay = retryAfter is { } minimum && minimum > backoff ? minimum : backoff;
-                if (delay >= budget - clock.GetElapsedTime(started))
+                var remaining = budget - clock.GetElapsedTime(started);
+                if (OperationDeadline.Current is { } operation && operation.Remaining < remaining)
+                    remaining = operation.Remaining;
+                if (delay >= remaining)
                     throw new PoliceApiException(PoliceApiFailure.RetryBudget);
                 await Task.Delay(delay, clock, total.Token);
             }

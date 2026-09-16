@@ -202,17 +202,17 @@ Dispatch key: Test-Proj:stage-07. State: CREATED (worktree setup queued). Target
 - Completed (UTC): —
 - Commit SHA (implementation): —
 - Push evidence / receipt: —
-- Summary: Planned; no implementation performed.
-- Functionality implemented: None.
-- Tests added: None.
-- Targeted test result: NOT RUN.
-- Full test result: NOT RUN.
-- Build result: NOT RUN for this stage.
-- Issues encountered / investigation: None yet.
-- Root cause: —
-- Resolution: —
-- Regression test: —
-- Notes / decisions: See IMPLEMENTATION_PLAN.md and shared requirements.
+- Summary: Scoped implementation and review complete; targeted/full tests and build passed. Status remains IN PROGRESS pending implementation push and receipt. Claim f607515568fb6ffaf97dc7ba0c354ea490c8b8a1 pushed and independently verified.
+- Functionality implemented: Bounded request pre-read and server size feature; whole-operation TimeProvider deadline through export I/O; isolated ambient remaining budget for GET retry admission; caller/deadline distinction and post-publication caller token restoration; sanitized framework 400/415 and validation errors; stable 413/504 codes; safe structured result/error logs; OpenAPI statuses/types/problem media metadata on all three routes. Shared global admission audited without changing service/export retry semantics.
+- Tests added: 41 genuine AAA Api cases with real middleware/filter/transport/services/exporter and fake HTTP/I/O boundaries. Known/unknown-length input at/over limit and bounded reads; writable server feature; reduced/snapshotted bytes/time; deadline during input/export and caller cancellation; old-file/cleanup/lease safety; publication commit point and response token; remaining retry delay budget; all three datasets blocking every other route; error/status/synthetic-sensitive-string matrix; validation/media-type sanitization; OpenAPI status/type/content type metadata; upstream byte/row limits; cleanup failure primary-error preservation; cancellation during response writes/already-started response; concurrent request budget isolation.
+- Targeted test result: 2026-09-16 dotnet test tests/PoliceDataIngestion.Api.Tests/PoliceDataIngestion.Api.Tests.csproj --filter FullyQualifiedName~Api --no-restore PASSED exit 0, 446 passed, 0 failed/skipped (Api occurs in every test namespace). Exact new-group filter FullyQualifiedName~Tests.Api PASSED exit 0, 41 passed, 0 failed/skipped, including final sanitization and content-type regressions.
+- Full test result: 2026-09-16 dotnet test "Test Proj.slnx" --no-restore PASSED exit 0, 446 passed, 0 failed/skipped (405 predecessor + 41 new). dotnet restore "Test Proj.slnx" PASSED exit 0, both projects restored, no audit warnings.
+- Build result: 2026-09-16 dotnet build "Test Proj.slnx" --no-restore PASSED exit 0, 0 warnings/errors.
+- Issues encountered / investigation: Initial test compilation failed because a logger helper shared the ILogger.Log method name; an initial broad rename also renamed the method. First discovered run passed 32 and failed 1: the synthetic marker payload overlapped the legitimate upstream_invalid_payload code. Later expanded run passed 41 but warned ASP0016 on test delegates returning an intentionally ignored result. Review identified that BadHttpRequestException 400 should also expose ValidationProblemDetails errors.
+- Root cause: C# member/class name collision and broad helper rename; ambiguous synthetic marker; generic Task result at a RequestDelegate boundary; incomplete 400 error-shape mapping.
+- Resolution: Renamed only the logger helper and restored interface method; used a distinct synthetic-upstream-body marker in both fixture and assertion; used explicit async Task lambdas; mapped HTTP 400 request errors to safe ValidationProblemDetails. Exact targeted regressions/full suite/build passed without warnings.
+- Regression test: Errors_StatusTable asserts 400 errors objects plus stable statuses/codes and no synthetic data. OpenApi_AllRoutes asserts exact status set, CLR schemas and application/problem+json metadata. Deadline_PublicationCommitPoint and RetryDelay_InputTimeConsumed preserve the two critical operational boundaries.
+- Notes / decisions: R7/R11/R12 and R19/R20 reviewed against requirements/architecture/security; no limit increases or dependencies added. Official call-limit page rechecked 2026-09-16 at https://data.police.uk/docs/api-call-limits/. Async-local budget avoids sharing state across requests. Input time consumes retry budget. Cancellation remains cooperative for synchronous OS durability/rename/cleanup calls; no detached background writes and no rollback after publication. README/architecture/security updated; host integration remains Stage 8. Existing net10.0 solution/application/namespace retained. Local settings never read/copied; tests use no live Police API or real Desktop. Explicit source/test/docs diff reviewed; generated outputs excluded.
 - Next stage: 8: Integration and final verification
 
 ## Stage 8: Integration and final verification
