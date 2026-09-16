@@ -22,19 +22,25 @@ async function request(url, options) {
   return response.json();
 }
 function render(page) {
-  const head = get('table-head'), body = get('table-body'); head.replaceChildren(); body.replaceChildren();
+  const head = get('table-head'), body = get('table-body');
+  if (!head || !body) {
+    status('The saved-data table is unavailable. Refresh the page and try again.', true);
+    return;
+  }
+  head.replaceChildren(); body.replaceChildren();
   const columns = ['key', ...new Set(page.items.flatMap(item => Object.keys(item.data)))];
   const header = document.createElement('tr'); columns.forEach(column => { const cell = document.createElement('th'); cell.textContent = column.replaceAll('_', ' '); header.append(cell); }); head.append(header);
   page.items.forEach(item => { const row = document.createElement('tr'); columns.forEach(column => { const cell = document.createElement('td'); const value = column === 'key' ? item.key : item.data[column]; cell.textContent = value === null || value === undefined ? '—' : typeof value === 'object' ? JSON.stringify(value) : String(value); row.append(cell); }); body.append(row); });
   totalCount = page.totalCount ?? 0;
   hasMore = page.hasMore;
   get('page').textContent = `Page ${Math.floor(offset / limit) + 1}`;
-  get('count').textContent = `${totalCount.toLocaleString()} saved records${get('search').value ? ' match your filter' : ''}.`;
+  const search = get('search');
+  get('count').textContent = `${totalCount.toLocaleString()} saved records${search?.value ? ' match your filter' : ''}.`;
   status(page.items.length ? `Showing ${offset + 1}–${Math.min(offset + page.items.length, totalCount)}.` : 'No saved records for this selection. Use Sync to retrieve data.');
 }
 async function load() {
   const dataset = get('dataset').value;
-  const query = new URLSearchParams({ offset, limit, search: get('search').value, ...(dataset === 'forces' ? {} : parameters()) });
+  const query = new URLSearchParams({ offset, limit, search: get('search')?.value ?? '', ...(dataset === 'forces' ? {} : parameters()) });
   render(await request(`/api/data/${dataset}?${query}`));
 }
 export async function run(sync = false) {
