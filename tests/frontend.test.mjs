@@ -15,7 +15,7 @@ class Element {
 const flush = () => new Promise(resolve => setImmediate(resolve));
 let instance = 0;
 async function harness(responder) {
-  const ids = ['dataset','latitude','longitude','month','filters','records','status','result','page','previous','next','sync','load','location'];
+  const ids = ['dataset','latitude','longitude','month','search','filters','records','table-head','table-body','status','result','count','page','previous','next','sync','load','location'];
   const nodes = Object.fromEntries(ids.map(id => [id, new Element()]));
   nodes.dataset.value = 'forces'; nodes.latitude.value = '53.8'; nodes.longitude.value = '-1.5'; nodes.month.value = '2024-01';
   globalThis.document = { getElementById: id => nodes[id], createElement: () => new Element(), querySelectorAll: () => ['dataset','latitude','longitude','month','previous','next','sync','load'].map(id => nodes[id]) };
@@ -59,7 +59,7 @@ test('database failure shows safe message, no payload and allows retry', async (
 test('untrusted stored content is rendered as literal text', async () => {
   const payload = '<img src=x onerror=alert(1)>';
   const { nodes } = await harness(() => response({ items: [{ key: 'a', data: { name: payload } }], hasMore: true }));
-  assert.equal(nodes.records.children[0].children[0].textContent, payload);
+  assert.equal(nodes['table-body'].children[0].children[1].textContent, payload);
   assert.equal(nodes.next.disabled, false); assert.equal(nodes.previous.disabled, true);
 });
 

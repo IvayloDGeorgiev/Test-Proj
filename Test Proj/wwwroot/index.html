@@ -7,9 +7,10 @@
 <label>Dataset<select id="dataset"><option value="forces">Police forces</option><option value="crimes">Street crimes</option><option value="stop-searches">Stop and searches</option></select></label>
 <fieldset id="location" hidden><legend>Location and month</legend><label>Latitude<input id="latitude" type="number" step="any" min="-90" max="90" value="53.8008" required></label><label>Longitude<input id="longitude" type="number" step="any" min="-180" max="180" value="-1.5491" required></label><label>Month<input id="month" type="month" value="2024-01" required></label></fieldset>
 <div class="actions"><button type="submit" id="load">Load saved data</button><button type="button" id="sync">Sync from Police API</button></div>
+<label class="search">Filter saved records<input id="search" type="search" maxlength="100" placeholder="Search ID, name, category…"></label>
 </form>
-<p id="status" role="status" aria-live="polite">Loading saved data…</p><p id="result" role="status"></p>
-<section id="records" aria-label="Saved records" aria-busy="false"></section>
+<p id="status" role="status" aria-live="polite">Loading saved data…</p><p id="result" role="status"></p><p id="count" aria-live="polite"></p>
+<section id="records" aria-label="Saved records" aria-busy="false"><table><thead id="table-head"></thead><tbody id="table-body"></tbody></table></section>
 <nav aria-label="Pages"><button id="previous" disabled>Previous</button><span id="page"></span><button id="next" disabled>Next</button></nav>
 <footer>Locations are approximate. Crimes are saved across queried locations within a month. Stop/search shows the latest snapshot for the exact location and month; it has no stable event identifiers.</footer>
 </main></body></html>

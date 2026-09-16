@@ -14,10 +14,13 @@ public sealed record SyncResult(bool Success, string Dataset, int Received, int 
 public sealed record PersistedItem(string Key, JsonElement Data, DateTimeOffset FirstSeenUtc,
     DateTimeOffset UpdatedAtUtc, DateTimeOffset LastSeenUtc);
 [System.Text.Json.Serialization.JsonNumberHandling(System.Text.Json.Serialization.JsonNumberHandling.Strict)]
-public sealed record PersistedPage(string Dataset, int Offset, int Limit, bool HasMore, IReadOnlyList<PersistedItem> Items);
+public sealed record PersistedPage(string Dataset, int Offset, int Limit, int TotalCount, bool HasMore, IReadOnlyList<PersistedItem> Items);
 
 public sealed class PoliceSyncService(PoliceDbContext db, IPoliceApiClient client, OperationLease admission, TimeProvider clock)
 {
+    public Task<PersistedPage> ReadAsync(string dataset, LocationMonthRequest? input, int offset, int limit, CancellationToken token) =>
+        ReadAsync(dataset, input, offset, limit, null, token);
+
     public async Task<SyncResult> SyncAsync(string dataset, LocationMonthRequest? input, CancellationToken token)
     {
         var request = Validate(dataset, input);
@@ -96,16 +99,20 @@ public sealed class PoliceSyncService(PoliceDbContext db, IPoliceApiClient clien
         finally { db.ChangeTracker.Clear(); }
     }
 
-    public async Task<PersistedPage> ReadAsync(string dataset, LocationMonthRequest? input, int offset, int limit, CancellationToken token)
+    public async Task<PersistedPage> ReadAsync(string dataset, LocationMonthRequest? input, int offset, int limit, string? search, CancellationToken token)
     {
         var request = Validate(dataset, input);
         if (offset is < 0 or > 1000000 || limit is < 1 or > 200) throw Invalid();
         var scope = Scope(dataset, request);
         try
         {
-            var rows = await db.Records.AsNoTracking().Where(x => x.Dataset == dataset && x.Scope == scope)
-                .OrderBy(x => x.Key).Skip(offset).Take(limit + 1).ToListAsync(token);
-            return new(dataset, offset, limit, rows.Count > limit, rows.Take(limit).Select(x =>
+            search = search?.Trim();
+            if (search is { Length: > 100 }) throw Invalid();
+            var query = db.Records.AsNoTracking().Where(x => x.Dataset == dataset && x.Scope == scope);
+            if (!string.IsNullOrWhiteSpace(search)) query = query.Where(x => x.Key.Contains(search) || x.Data.Contains(search));
+            var total = await query.CountAsync(token);
+            var rows = await query.OrderBy(x => x.Key).Skip(offset).Take(limit + 1).ToListAsync(token);
+            return new(dataset, offset, limit, total, rows.Count > limit, rows.Take(limit).Select(x =>
                 new PersistedItem(x.Key, JsonSerializer.Deserialize<JsonElement>(x.Data), x.FirstSeenUtc, x.UpdatedAtUtc, x.LastSeenUtc)).ToArray());
         }
         catch (OperationCanceledException) { throw; }

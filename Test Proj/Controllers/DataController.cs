@@ -17,8 +17,9 @@ public sealed class DataController(PoliceSyncService service) : ControllerBase
     [ProducesResponseType<PersistedPage>(200)]
     public Task<PersistedPage> Get(string dataset, CancellationToken cancellationToken,
         [FromQuery] double? latitude = null, [FromQuery] double? longitude = null,
-        [FromQuery] string? month = null, [FromQuery] int offset = 0, [FromQuery] int limit = 50) =>
-        service.ReadAsync(dataset, new(latitude, longitude, month), offset, limit, cancellationToken);
+        [FromQuery] string? month = null, [FromQuery] int offset = 0, [FromQuery] int limit = 20,
+        [FromQuery] string? search = null) =>
+        service.ReadAsync(dataset, new(latitude, longitude, month), offset, limit, search, cancellationToken);
 }
 
 [ApiController]
