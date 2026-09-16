@@ -4,7 +4,6 @@ using Test_Proj.Export;
 using Test_Proj.Services.Forces;
 using Test_Proj.Errors;
 using Test_Proj.Persistence;
-using System.Reflection.Metadata.Ecma335;
 using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +34,8 @@ builder.Services.AddControllers(options => options.Filters.Add<IngestionResultFi
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+if (builder.Configuration.GetValue("Database:ApplyMigrations", true))
+    await PersistenceRegistration.EnsureDatabaseAndMigrateAsync(app.Services);
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();

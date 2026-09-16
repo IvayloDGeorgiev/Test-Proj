@@ -19,6 +19,51 @@ public static class PersistenceRegistration
         return services;
     }
 
+    public static async Task EnsureDatabaseAndMigrateAsync(IServiceProvider services, CancellationToken cancellationToken = default)
+    {
+        var configuration = services.GetRequiredService<IConfiguration>();
+        var connection = configuration.GetConnectionString("DefaultConnection");
+        // Keep the existing CSV-only host usable when no database has been configured.
+        if (string.IsNullOrWhiteSpace(connection)) return;
+
+        NpgsqlConnectionStringBuilder parsed;
+        try { parsed = new NpgsqlConnectionStringBuilder(connection); }
+        catch { throw new DatabaseConfigurationException(); }
+        parsed.IncludeErrorDetail = false;
+        parsed.LogParameters = false;
+        parsed.Timeout = Math.Clamp(parsed.Timeout, 1, 15);
+        parsed.CommandTimeout = Math.Clamp(parsed.CommandTimeout, 1, 30);
+
+        try
+        {
+            await using var target = new NpgsqlConnection(parsed.ConnectionString);
+            await target.OpenAsync(cancellationToken);
+        }
+        catch (PostgresException error) when (error.SqlState == PostgresErrorCodes.InvalidCatalogName)
+        {
+            var databaseName = parsed.Database ?? throw new DatabaseConfigurationException();
+            parsed.Database = "postgres";
+            await using var admin = new NpgsqlConnection(parsed.ConnectionString);
+            await admin.OpenAsync(cancellationToken);
+            await using var create = new NpgsqlCommand($"CREATE DATABASE {QuoteIdentifier(databaseName)}", admin);
+            await create.ExecuteNonQueryAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception) { throw new DatabaseOperationException(); }
+
+        try
+        {
+            await using var scope = services.CreateAsyncScope();
+            var db = scope.ServiceProvider.GetRequiredService<PoliceDbContext>();
+            await db.Database.MigrateAsync(cancellationToken);
+        }
+        catch (OperationCanceledException) { throw; }
+        catch (Exception) { throw new DatabaseOperationException(); }
+    }
+
+    private static string QuoteIdentifier(string value) =>
+        "\"" + value.Replace("\"", "\"\"", StringComparison.Ordinal) + "\"";
+
     public static void Configure(DbContextOptionsBuilder options, string? connection)
     {
         try

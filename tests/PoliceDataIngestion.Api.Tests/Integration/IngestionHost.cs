@@ -36,7 +36,8 @@ internal sealed class IngestionHost : WebApplicationFactory<Program>
         ["Export:MaximumQueuedOperations"] = "0",
         ["AllowedHosts"] = "localhost",
         ["Logging:LogLevel:Default"] = "Information",
-        ["Logging:LogLevel:Microsoft.AspNetCore"] = "Warning"
+        ["Logging:LogLevel:Microsoft.AspNetCore"] = "Warning",
+        ["Database:ApplyMigrations"] = "false"
     };
     public string EnvironmentName { get; set; } = "Production";
     public string? WebRoot { get; set; }
